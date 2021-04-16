@@ -117,7 +117,7 @@ int EposCommunication::SetPositionProfile(HANDLE p_DeviceHandle, unsigned short 
 	//to use set variables below first!
 	int lResult = MMC_SUCCESS;
 
-	if(VCS_SetPositionProfile(p_DeviceHandle, p_usNodeId, profile_velocity, profile_acceleration, profile_deceleration, p_pErrorCode) == MMC_FAILED)
+	if(VCS_SetPositionProfile(p_DeviceHandle, p_usNodeId, radsToRpm(profile_velocity), radsToRpm(profile_acceleration), radsToRpm(profile_deceleration), p_pErrorCode) == MMC_FAILED)
 	{
 		LogError("VCS_SetPositionProfile", lResult, *p_pErrorCode);
 		lResult = MMC_FAILED;
@@ -909,6 +909,20 @@ int EposCommunication::mmToCounts(float mm){
 	int counts = mm  * 4096 * 100 / (2 * M_PI);
 	ROS_INFO_STREAM("counts: " << counts);
 	return counts;
+}
+
+int EposCommunication::radsToRpm(float rads)
+{
+	int rpm;
+	rpm = rads * 100 * 60 / (2 * M_PI);
+	return rpm;
+}
+
+float EposCommunication::rpmToRads(int rpm)
+{
+	int rads;
+	rads = rpm / 100. / 60. * (2 * M_PI);
+	return rpm;
 }
 
 	/* workflow:

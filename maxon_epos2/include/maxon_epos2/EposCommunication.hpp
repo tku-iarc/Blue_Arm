@@ -133,6 +133,8 @@ class EposCommunication
   int	  GetVelocity(int* pVelocityIsCounts, unsigned int* p_pErrorCode);
   float countsTomm(int* counts);
   int 	mmToCounts(float mm);
+  int   radsToRpm(float rads);
+  float rpmToRads(int rpm);
 
 
 }; /* Class */

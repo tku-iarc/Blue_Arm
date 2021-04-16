@@ -1,7 +1,0 @@
-int32   motor_id
-float32 position_setpoint
-int32 velocity
----
-bool success
-float32 position
-float32 velocity

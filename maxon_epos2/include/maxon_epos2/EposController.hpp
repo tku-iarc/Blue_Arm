@@ -76,7 +76,7 @@ class EposController
   // maxon_epos2::epos_motor_info motor;
 
   unsigned short id_list[7] = {1, 2, 3, 4, 5, 6, 7};
-  int motors = 2;
+  int motors = 7;
 };
 
 } /* namespace */

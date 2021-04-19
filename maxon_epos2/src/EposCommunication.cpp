@@ -772,9 +772,9 @@ int EposCommunication::startPositionMode()
 	return lResult;
 }
 
-int EposCommunication::setPositionProfile(unsigned short p_usNodeId, unsigned int profile_velocity,
-										  unsigned int profile_acceleration = 1000,
-										  unsigned int profile_deceleration = 1000)
+int EposCommunication::setPositionProfile(unsigned short p_usNodeId, float profile_velocity,
+										  float profile_acceleration = 1000,
+										  float profile_deceleration = 1000)
 {
 	// int lResult = MMC_FAILED;
 	// unsigned int ulErrorCode = 0;
@@ -791,7 +791,7 @@ int EposCommunication::setPositionProfile(unsigned short p_usNodeId, unsigned in
 	int lResult = MMC_SUCCESS;
 	HANDLE p_DeviceHandle = (p_usNodeId == g_usNodeId) ? g_pKeyHandle : g_pSubKeyHandle;
 
-	if(VCS_SetPositionProfile(p_DeviceHandle, p_usNodeId, profile_velocity, profile_acceleration, profile_deceleration, &ulErrorCode) == MMC_FAILED)
+	if(VCS_SetPositionProfile(p_DeviceHandle, p_usNodeId, radsToRpm(profile_velocity), radsToRpm(profile_acceleration), radsToRpm(profile_deceleration), &ulErrorCode) == MMC_FAILED)
 	{
 		LogError("VCS_SetPositionProfile", lResult, ulErrorCode, p_usNodeId);
 		lResult = MMC_FAILED;
@@ -883,7 +883,7 @@ int EposCommunication::getVelocity(unsigned short p_usNodeId, float* pVelocityIs
 		LogError("VCS_GetVelocityIs", lResult, ulErrorCode, p_usNodeId);
 		lResult = MMC_FAILED;
 	}
-	*pVelocityIs = countsTomm(&pVelocityIsCounts);
+	*pVelocityIs = rpmToRads(&pVelocityIsCounts);
 	return lResult;
 }
 
@@ -918,11 +918,11 @@ int EposCommunication::radsToRpm(float rads)
 	return rpm;
 }
 
-float EposCommunication::rpmToRads(int rpm)
+float EposCommunication::rpmToRads(int* rpm)
 {
-	int rads;
-	rads = rpm / 100. / 60. * (2 * M_PI);
-	return rpm;
+	float rads;
+	rads = (*rpm) / 100. / 60. * (2 * M_PI);
+	return rads;
 }
 
 	/* workflow:

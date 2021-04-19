@@ -65,7 +65,7 @@ bool EposController::serviceCallback(maxon_epos2::epos_motor_service::Request& r
 	ROS_INFO_STREAM("Requested position" << request.position_setpoint[0]);
 	for(int i = 0; i < request.motor_id.size(); i++)
 	{
-		if(epos_device_.setPositionProfile(request.motor_id[i], request.velocity[i], request.velocity[i], request.velocity[i])==MMC_FAILED) 
+		if(epos_device_.setPositionProfile(request.motor_id[i], request.velocity[i], 2 * request.velocity[i], 2 * request.velocity[i])==MMC_FAILED) 
 			ROS_ERROR("Seting position profile failed");
 		if(epos_device_.setPosition(request.motor_id[i], request.position_setpoint[i])==MMC_FAILED) 
 			ROS_ERROR("setPosition failed");

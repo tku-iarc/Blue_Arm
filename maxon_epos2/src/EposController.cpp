@@ -62,9 +62,14 @@ bool EposController::homingCallback(std_srvs::Trigger::Request& request, std_srv
 }
 
 bool EposController::serviceCallback(maxon_epos2::epos_motor_service::Request& request, maxon_epos2::epos_motor_service::Response& response){
-	ROS_INFO_STREAM("Requested position" << request.position_setpoint);
-	if(epos_device_.setPositionProfile(request.motor_id, request.velocity, request.velocity, request.velocity)==MMC_FAILED) ROS_ERROR("Seting position profile failed");
-	if(epos_device_.setPosition(request.motor_id, request.position_setpoint)==MMC_FAILED) ROS_ERROR("setPosition failed");
+	ROS_INFO_STREAM("Requested position" << request.position_setpoint[0]);
+	for(int i = 0; i < request.motor_id.size(); i++)
+	{
+		if(epos_device_.setPositionProfile(request.motor_id[i], request.velocity[i], 2 * request.velocity[i], 2 * request.velocity[i])==MMC_FAILED) 
+			ROS_ERROR("Seting position profile failed");
+		if(epos_device_.setPosition(request.motor_id[i], request.position_setpoint[i])==MMC_FAILED) 
+			ROS_ERROR("setPosition failed");
+	}
 	response.success = true;
 	// if((epos_device_.getPosition(0, &response.position)) == MMC_FAILED) ROS_ERROR("getPosition failed for service");
 	// if((epos_device_.getVelocity(0, &response.velocity)) == MMC_FAILED) ROS_ERROR("getVelocity failed for service");

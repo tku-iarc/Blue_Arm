@@ -1,0 +1,4 @@
+int32     move_speed
+float32[] joint_angle
+---
+bool success

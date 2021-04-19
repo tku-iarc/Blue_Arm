@@ -75,8 +75,8 @@ class EposController
   //! Create variable for publishing motor info
   // maxon_epos2::epos_motor_info motor;
 
-  unsigned short id_list[2] = {7, 2};
-  int motors = 2;
+  unsigned short id_list[7] = {1, 2, 3, 4, 5, 6, 7};
+  int motors = 7;
 };
 
 } /* namespace */

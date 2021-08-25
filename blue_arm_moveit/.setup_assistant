@@ -1,0 +1,11 @@
+moveit_setup_assistant_config:
+  URDF:
+    package: blue_arm_description
+    relative_path: urdf/blue_arm.xacro
+    xacro_args: ""
+  SRDF:
+    relative_path: config/blue_arm.srdf
+  CONFIG:
+    author_name: andy chien
+    author_email: r960411@gmail.com
+    generated_timestamp: 1629789633

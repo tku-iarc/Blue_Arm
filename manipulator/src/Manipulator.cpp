@@ -1,10 +1,19 @@
 #include "manipulator/Manipulator.hpp"
 
+Manipulator::Manipulator()
+{
+    sample_rate = 100;
+    arm_state = Disable;
+    joint_data_init()
+    blue_arm_interface = BlueArmInterface(joint_data, sample_rate);
+}
+
 Manipulator::Manipulator(ros::NodeHandle& nodeHandle)
     :nodeHandle_(nodeHandle)
 {
-    std::cout<<"4"<<std::endl;
+    sample_rate = 100;
     arm_state = Disable;
+    joint_data_init();
     //! ROS topic Pub.
     arm_state_pub = nodeHandle_.advertise<manipulator::ArmState>("/manipulator/arm_state_msg", 0);
 
@@ -18,8 +27,17 @@ Manipulator::Manipulator(ros::NodeHandle& nodeHandle)
 
     //! ROS service client
     motor_cmd_client = nodeHandle_.serviceClient<maxon_epos2::epos_motor_service>("/maxon/epos_control_service", 0);
-    std::cout<<"5 "<<sizeof(joint_data)<<" "<<sizeof(joint_data[0])<<std::endl;
+}
+
+Manipulator::~Manipulator()
+{
+
+}
+
+void Manipulator::joint_data_init()
+{
     joint_data[0].id_           = 1;
+    joint_data[0].joint_name_   = "joint_1"
     joint_data[0].joint_angle_  = 0;
     joint_data[0].min_angle_    = -1 * M_PI;
     joint_data[0].max_angle_    = M_PI;
@@ -29,9 +47,10 @@ Manipulator::Manipulator(ros::NodeHandle& nodeHandle)
     joint_data[0].deceleration_ = 0;
     joint_data[0].angle_cmd_    = 0;
     joint_data[0].velocity_cmd_ = 0;
-    std::cout<<"6"<<std::endl;
+    joint_data[0].effort_       = 0;
 
     joint_data[1].id_           = 2;
+    joint_data[1].joint_name_   = "joint_2"
     joint_data[1].joint_angle_  = 0;
     joint_data[1].min_angle_    = -1 * M_PI;
     joint_data[1].max_angle_    = M_PI;
@@ -41,8 +60,10 @@ Manipulator::Manipulator(ros::NodeHandle& nodeHandle)
     joint_data[1].deceleration_ = 0;
     joint_data[1].angle_cmd_    = 0;
     joint_data[1].velocity_cmd_ = 0;
+    joint_data[1].effort_       = 0;
 
     joint_data[2].id_           = 3;
+    joint_data[2].joint_name_   = "joint_3"
     joint_data[2].joint_angle_  = 0;
     joint_data[2].min_angle_    = -1 * M_PI;
     joint_data[2].max_angle_    = M_PI;
@@ -52,8 +73,10 @@ Manipulator::Manipulator(ros::NodeHandle& nodeHandle)
     joint_data[2].deceleration_ = 0;
     joint_data[2].angle_cmd_    = 0;
     joint_data[2].velocity_cmd_ = 0;
+    joint_data[2].effort_       = 0;
 
     joint_data[3].id_           = 4;
+    joint_data[3].joint_name_   = "joint_4"
     joint_data[3].joint_angle_  = 0;
     joint_data[3].min_angle_    = -1 * M_PI;
     joint_data[3].max_angle_    = M_PI;
@@ -63,8 +86,10 @@ Manipulator::Manipulator(ros::NodeHandle& nodeHandle)
     joint_data[3].deceleration_ = 0;
     joint_data[3].angle_cmd_    = 0;
     joint_data[3].velocity_cmd_ = 0;
+    joint_data[3].effort_       = 0;
 
     joint_data[4].id_           = 5;
+    joint_data[4].joint_name_   = "joint_5"
     joint_data[4].joint_angle_  = 0;
     joint_data[4].min_angle_    = -1 * M_PI;
     joint_data[4].max_angle_    = M_PI;
@@ -74,8 +99,10 @@ Manipulator::Manipulator(ros::NodeHandle& nodeHandle)
     joint_data[4].deceleration_ = 0;
     joint_data[4].angle_cmd_    = 0;
     joint_data[4].velocity_cmd_ = 0;
+    joint_data[4].effort_       = 0;
 
     joint_data[5].id_           = 6;
+    joint_data[5].joint_name_   = "joint_6"
     joint_data[5].joint_angle_  = 0;
     joint_data[5].min_angle_    = -1 * M_PI;
     joint_data[5].max_angle_    = M_PI;
@@ -85,8 +112,10 @@ Manipulator::Manipulator(ros::NodeHandle& nodeHandle)
     joint_data[5].deceleration_ = 0;
     joint_data[5].angle_cmd_    = 0;
     joint_data[5].velocity_cmd_ = 0;
+    joint_data[5].effort_       = 0;
 
     joint_data[6].id_           = 7;
+    joint_data[6].joint_name_   = "joint_7"
     joint_data[6].joint_angle_  = 0;
     joint_data[6].min_angle_    = -1 * M_PI;
     joint_data[6].max_angle_    = M_PI;
@@ -96,11 +125,7 @@ Manipulator::Manipulator(ros::NodeHandle& nodeHandle)
     joint_data[6].deceleration_ = 0;
     joint_data[6].angle_cmd_    = 0;
     joint_data[6].velocity_cmd_ = 0;
-    std::cout<<"7"<<std::endl;
-}
-Manipulator::~Manipulator()
-{
-
+    joint_data[6].effort_       = 0;
 }
 
 void Manipulator::joint_state_cb(const maxon_epos2::epos_motor_info::ConstPtr &msg)
@@ -172,9 +197,15 @@ bool Manipulator::kinematics()
 {
 
 }
-void Manipulator::process()
+void Manipulator::statePublisher()
 {
     manipulator::ArmState msg;
     msg.state = arm_state;
     arm_state_pub.publish(msg);
+}
+void Manipulator::process()
+{
+    blue_arm_interface.read();
+    blue_arm_cm.update(blue_arm_interface.get_time(), blue_arm_interface.get_period());
+    blue_arm_interface.write();
 }

@@ -12,39 +12,109 @@
 #include "maxon_epos2/EposController.hpp"
 
 namespace maxon_epos2 {
+EposController::EposController()
+{
+//   unsigned short id_list[2] = {7, 2};
+	//Initialize device:
+	if((epos_device_.initialization(id_list, motors))==MMC_FAILED) ROS_ERROR("Device initialization");
+	//Start position mode during homing callback function:
+	if((epos_device_.startPositionMode())==MMC_FAILED) ROS_ERROR("Starting position mode failed");
+	//   if((epos_device_.setPositionProfile())==MMC_FAILED) ROS_ERROR("Seting position profile failed");
+}
 
 EposController::EposController(ros::NodeHandle& nodeHandle)
     : nodeHandle_(nodeHandle)
 {
-  if (!readParameters()) {
-    ROS_ERROR("Could not read parameters.");
-    ros::requestShutdown();
-  }
-//   unsigned short id_list[2] = {7, 2};
-  //Initialize device:
-  if((epos_device_.initialization(id_list, motors))==MMC_FAILED) ROS_ERROR("Device initialization");
-  //Start position mode during homing callback function:
-  if((epos_device_.startPositionMode())==MMC_FAILED) ROS_ERROR("Starting position mode failed");
-//   if((epos_device_.setPositionProfile())==MMC_FAILED) ROS_ERROR("Seting position profile failed");
+	if (!readParameters()) {
+		ROS_ERROR("Could not read parameters.");
+		ros::requestShutdown();
+	}
+	//   unsigned short id_list[2] = {7, 2};
+	//Initialize device:
+	if((epos_device_.initialization(id_list, motors))==MMC_FAILED) ROS_ERROR("Device initialization");
+	//Start position mode during homing callback function:
+	if((epos_device_.startPositionMode())==MMC_FAILED) ROS_ERROR("Starting position mode failed");
+	//   if((epos_device_.setPositionProfile())==MMC_FAILED) ROS_ERROR("Seting position profile failed");
 
 
-  publisher_ = nodeHandle_.advertise<maxon_epos2::epos_motor_info>(publisherTopic_, 10);
-  homing_service_ = nodeHandle_.advertiseService("epos_homing_service", &EposController::homingCallback, this);
-  service_ = nodeHandle_.advertiseService(serviceName_, &EposController::serviceCallback, this);
+	publisher_ = nodeHandle_.advertise<maxon_epos2::epos_motor_info>(publisherTopic_, 10);
+	homing_service_ = nodeHandle_.advertiseService("epos_homing_service", &EposController::homingCallback, this);
+	service_ = nodeHandle_.advertiseService(serviceName_, &EposController::serviceCallback, this);
 
 
-  ROS_INFO("Successfully launched EPOS Controller node.");
+	ROS_INFO("Successfully launched EPOS Controller node.");
 }
 
 EposController::~EposController()
 {
 }
 
+bool EposController::deviceOpenedCheck()
+{
+	return epos_device_.deviceOpenedCheck() == MMC_SUCCESS;
+}
+
+bool EposController::read(int id, float& pos, float& vel, float& eff)
+{
+	if(epos_device_.getPosition(id, &pos) == MMC_FAILED)
+	{
+		ROS_ERROR("Get position failed");
+		return false;
+	}
+	if(epos_device_.getVelocity(id, &vel) == MMC_FAILED)
+	{
+		ROS_ERROR("Get velocity failed");
+		return false;
+	}
+	eff = 0;
+	return true;
+	// if((epos_device_.deviceOpenedCheck()) == MMC_SUCCESS)
+	// {
+	// 	for(int i = 0; i < motors; i++)
+	// 	{
+	// 		epos_device_.getPosition(id_list[i], &poss[i]);
+	// 		epos_device_.getVelocity(id_list[i], &vels[i]);
+	// 		effs[i] = 0;
+	// 	}
+	// }
+	// else
+	// 	return false;
+	// return true;
+}
+
+bool EposController::write(int id, float& cmd, float& vel)
+{
+	if(epos_device_.setPositionProfile(id, vel, 2 * vel, 2 * vel)==MMC_FAILED)
+	{
+		ROS_ERROR("Seting position profile failed");
+		return false;
+	}
+	if(epos_device_.setPosition(id, cmd)==MMC_FAILED)
+	{
+		ROS_ERROR("Seting position failed");
+		return false;
+	}
+	return true;
+	// for(int i = 0; i < motors; i++)
+	// {
+	// 	if(epos_device_.setPositionProfile(id_list[i], vel, 2 * vel, 2 * vel)==MMC_FAILED)
+	// 	{
+	// 		ROS_ERROR("Seting position profile failed");
+	// 		return false;
+	// 	}
+	// 	if(epos_device_.setPosition(id_list[i], cmds[i])==MMC_FAILED)
+	// 	{
+	// 		ROS_ERROR("setPosition failed");
+	// 		return false;
+	// 	}
+	// }
+	// return true;
+}
 bool EposController::readParameters()
 {
-  if (!nodeHandle_.getParam("publisher_topic", publisherTopic_)) return false;
-  if (!nodeHandle_.getParam("service_name", serviceName_)) return false;
-  return true;
+	if (!nodeHandle_.getParam("publisher_topic", publisherTopic_)) return false;
+	if (!nodeHandle_.getParam("service_name", serviceName_)) return false;
+	return true;
 }
 
 bool EposController::homingCallback(std_srvs::Trigger::Request& request, std_srvs::Trigger::Response& response){
@@ -76,7 +146,7 @@ bool EposController::serviceCallback(maxon_epos2::epos_motor_service::Request& r
 	return true;
 }
 
-void EposController::publisher_loop(){
+void EposController::publisherLoop(){
 	float position, velocity;
 	maxon_epos2::epos_motor_info motor;
 	if((epos_device_.deviceOpenedCheck()) == MMC_SUCCESS)
@@ -101,7 +171,7 @@ void EposController::publisher_loop(){
 	}
 }
 
-void EposController::close_device(){
+void EposController::closeDevice(){
 	  if((epos_device_.closeDevice()) == MMC_FAILED) ROS_ERROR("Device closing failed");
 }
 

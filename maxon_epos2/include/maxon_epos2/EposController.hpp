@@ -12,6 +12,7 @@
 
 // STD
 #include <string>
+#include <cmath>
 
 #include "maxon_epos2/EposCommunication.hpp"
 
@@ -30,6 +31,7 @@ namespace maxon_epos2 {
 class EposController
 {
  public:
+  EposController();
   /*!
    * Constructor.
    * @param nodeHandle the ROS node handle.
@@ -40,9 +42,11 @@ class EposController
    * Destructor.
    */
   virtual ~EposController();
-
-  void publisher_loop();
-  void close_device();
+  bool deviceOpenedCheck();
+  bool read(int id, float& pos, float& vel, float& eff);
+  bool write(int id, float& cmd, float& vel);
+  void publisherLoop();
+  void closeDevice();
 
  private:
   /*!

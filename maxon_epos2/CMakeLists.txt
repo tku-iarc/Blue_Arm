@@ -121,6 +121,7 @@ ${catkin_INCLUDE_DIRS}
 ## Declare a C++ library
 add_library(${PROJECT_NAME}_core
   src/EposCommunication.cpp
+  src/EposController.cpp
 )
 
 ## Add cmake target dependencies of the library

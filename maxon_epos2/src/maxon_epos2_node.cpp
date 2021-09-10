@@ -27,13 +27,13 @@ int main(int argc, char** argv)
 
 	//publish until node gets interrupted
 	while (ros::ok()){
-		EposController.publisher_loop();
+		EposController.publisherLoop();
 		ros::spinOnce();
 		loop_rate.sleep();
 	}
 
 	//if node is interrupted, close device
-	EposController.close_device();
+	EposController.closeDevice();
 
 	return 0;
 }

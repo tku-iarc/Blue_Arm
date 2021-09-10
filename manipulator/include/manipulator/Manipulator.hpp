@@ -9,6 +9,8 @@
 
 #include "maxon_epos2/epos_motor_info.h"
 #include "maxon_epos2/epos_motor_service.h"
+#include "manipulator/hardware_interface.hpp"
+#include "manipulator/joint_data.hpp"
 #include "manipulator/ArmState.h"
 #include "manipulator/JointMove.h"
 #include "manipulator/LineMove.h"
@@ -19,28 +21,14 @@
 
 enum ArmState {Idle, Busy, Error, Disable};
 
-struct JointData
-{
-public:
-
-    int id_;
-    float joint_angle_;
-    float min_angle_;
-    float max_angle_;
-    float max_velocity_;
-    float velocity_;
-    float acceleration_;
-    float deceleration_;
-    float angle_cmd_;
-    float velocity_cmd_;
-};
-
 class Manipulator
 {
 private:
+    float sample_rate;
     /* data */
     ArmState arm_state;
-    JointData joint_data[DOF];
+    BlueArmInterface blue_arm_interface;
+    controller_manager::ControllerManager blue_arm_cm;
 
     ros::NodeHandle& nodeHandle_;
 
@@ -58,7 +46,10 @@ private:
     //! ROS service client
     ros::ServiceClient motor_cmd_client;
 
+
+
 public:
+    Manipulator()
     Manipulator(ros::NodeHandle& nodeHandle);
     ~Manipulator();
     void joint_state_cb(const maxon_epos2::epos_motor_info::ConstPtr &msg);
@@ -66,5 +57,7 @@ public:
     bool p2p_move_cb(manipulator::JointMove::Request &req, manipulator::JointMove::Response &res);
     bool line_move_cb(manipulator::JointMove::Request &req, manipulator::JointMove::Response &res);
     bool kinematics();
+    void statePublisher()
     void process();
+    std::vector<JointData> joint_data(DOF);
 };

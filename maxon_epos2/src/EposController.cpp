@@ -22,28 +22,28 @@ EposController::EposController()
 	//   if((epos_device_.setPositionProfile())==MMC_FAILED) ROS_ERROR("Seting position profile failed");
 }
 
-EposController::EposController(ros::NodeHandle& nodeHandle)
-    : nodeHandle_(nodeHandle)
-{
-	if (!readParameters()) {
-		ROS_ERROR("Could not read parameters.");
-		ros::requestShutdown();
-	}
-	//   unsigned short id_list[2] = {7, 2};
-	//Initialize device:
-	if((epos_device_.initialization(id_list, motors))==MMC_FAILED) ROS_ERROR("Device initialization");
-	//Start position mode during homing callback function:
-	if((epos_device_.startPositionMode())==MMC_FAILED) ROS_ERROR("Starting position mode failed");
-	//   if((epos_device_.setPositionProfile())==MMC_FAILED) ROS_ERROR("Seting position profile failed");
+// EposController::EposController(ros::NodeHandle& nodeHandle)
+//     : nodeHandle_(nodeHandle)
+// {
+// 	if (!readParameters()) {
+// 		ROS_ERROR("Could not read parameters.");
+// 		ros::requestShutdown();
+// 	}
+// 	//   unsigned short id_list[2] = {7, 2};
+// 	//Initialize device:
+// 	if((epos_device_.initialization(id_list, motors))==MMC_FAILED) ROS_ERROR("Device initialization");
+// 	//Start position mode during homing callback function:
+// 	if((epos_device_.startPositionMode())==MMC_FAILED) ROS_ERROR("Starting position mode failed");
+// 	//   if((epos_device_.setPositionProfile())==MMC_FAILED) ROS_ERROR("Seting position profile failed");
 
 
-	publisher_ = nodeHandle_.advertise<maxon_epos2::epos_motor_info>(publisherTopic_, 10);
-	homing_service_ = nodeHandle_.advertiseService("epos_homing_service", &EposController::homingCallback, this);
-	service_ = nodeHandle_.advertiseService(serviceName_, &EposController::serviceCallback, this);
+// 	publisher_ = nodeHandle_.advertise<maxon_epos2::epos_motor_info>(publisherTopic_, 10);
+// 	homing_service_ = nodeHandle_.advertiseService("epos_homing_service", &EposController::homingCallback, this);
+// 	service_ = nodeHandle_.advertiseService(serviceName_, &EposController::serviceCallback, this);
 
 
-	ROS_INFO("Successfully launched EPOS Controller node.");
-}
+// 	ROS_INFO("Successfully launched EPOS Controller node.");
+// }
 
 EposController::~EposController()
 {
@@ -54,7 +54,7 @@ bool EposController::deviceOpenedCheck()
 	return epos_device_.deviceOpenedCheck() == MMC_SUCCESS;
 }
 
-bool EposController::read(int id, float& pos, float& vel, float& eff)
+bool EposController::read(int id, double& pos, double& vel, double& eff)
 {
 	if(epos_device_.getPosition(id, &pos) == MMC_FAILED)
 	{
@@ -82,7 +82,7 @@ bool EposController::read(int id, float& pos, float& vel, float& eff)
 	// return true;
 }
 
-bool EposController::write(int id, float& cmd, float& vel)
+bool EposController::write(int id, double& cmd, double& vel)
 {
 	if(epos_device_.setPositionProfile(id, vel, 2 * vel, 2 * vel)==MMC_FAILED)
 	{
@@ -110,12 +110,12 @@ bool EposController::write(int id, float& cmd, float& vel)
 	// }
 	// return true;
 }
-bool EposController::readParameters()
-{
-	if (!nodeHandle_.getParam("publisher_topic", publisherTopic_)) return false;
-	if (!nodeHandle_.getParam("service_name", serviceName_)) return false;
-	return true;
-}
+// bool EposController::readParameters()
+// {
+// 	if (!nodeHandle_.getParam("publisher_topic", publisherTopic_)) return false;
+// 	if (!nodeHandle_.getParam("service_name", serviceName_)) return false;
+// 	return true;
+// }
 
 bool EposController::homingCallback(std_srvs::Trigger::Request& request, std_srvs::Trigger::Response& response){
 	ROS_INFO("Requested homing service");
@@ -147,7 +147,7 @@ bool EposController::serviceCallback(maxon_epos2::epos_motor_service::Request& r
 }
 
 void EposController::publisherLoop(){
-	float position, velocity;
+	double position, velocity;
 	maxon_epos2::epos_motor_info motor;
 	if((epos_device_.deviceOpenedCheck()) == MMC_SUCCESS)
 	{
@@ -163,7 +163,7 @@ void EposController::publisherLoop(){
 // ****only output these for DEBUGGING******
 //		if((epos_device_.getPosition(&motor.position)) == MMC_FAILED) ROS_ERROR("getPosition failed for message");
 //		if((epos_device_.getVelocity(&motor.velocity)) == MMC_FAILED) ROS_ERROR("getVelocity failed for message");
-		publisher_.publish(motor);
+		// publisher_.publish(motor);
 	}
 	else{
 		//****only for DEBUGGING****

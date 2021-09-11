@@ -70,12 +70,12 @@ class EposCommunication
   int 	homing();
   int 	startPositionMode();
   int   setPositionProfile(unsigned short p_usNodeId,
-                           float profile_velocity,
-										       float profile_acceleration,
-										       float profile_deceleration);
-  int 	setPosition(unsigned short p_usNodeI, float position_setpoint);
-  int 	getPosition(unsigned short p_usNodeI, float* pPositionIs);
-  int 	getVelocity(unsigned short p_usNodeI, float* pVelocityIs);
+                           double profile_velocity,
+										       double profile_acceleration,
+										       double profile_deceleration);
+  int 	setPosition(unsigned short p_usNodeI, double position_setpoint);
+  int 	getPosition(unsigned short p_usNodeI, double* pPositionIs);
+  int 	getVelocity(unsigned short p_usNodeI, double* pVelocityIs);
   int 	closeDevice();
 
  private:
@@ -131,10 +131,10 @@ class EposCommunication
   int	  PrintAvailableProtocols();
   int	  GetPosition(int* pPositionIsCounts, unsigned int* p_pErrorCode);
   int	  GetVelocity(int* pVelocityIsCounts, unsigned int* p_pErrorCode);
-  float countsTomm(int* counts);
-  int 	mmToCounts(float mm);
-  int   radsToRpm(float rads);
-  float rpmToRads(int* rpm);
+  double countsTomm(int* counts);
+  int 	mmToCounts(double mm);
+  int   radsToRpm(double rads);
+  double rpmToRads(int* rpm);
 
 
 }; /* Class */

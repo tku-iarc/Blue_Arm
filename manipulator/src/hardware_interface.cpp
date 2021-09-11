@@ -1,13 +1,18 @@
-#include "manipulator/hardware_interface.hpp"
+#include "manipulator/hardware_interface.h"
 #include <ros/ros.h>
 
-BlueArmInterface::BlueArmInterface(std::vector<JointData> &joint_data, double sample_rate) 
+namespace hardware_interface
+{
+
+BlueArmInterface::BlueArmInterface(std::vector<JointData*>& joint_data, float sample_rate) 
 { 
     this->sample_rate = sample_rate;
-    jd_ptr = &joint_data;
-    for (int i=0; i < jd_ptr->size(); i++)
+    jd_ptr = joint_data;
+    time_now = ros::Time::now();
+    time_last = ros::Time::now();
+    for (int i=0; i < jd_ptr.size(); i++)
     {   
-        hardware_interface::JointStateHandle state_handle(jd_ptr[i].joint_name_, &jd_ptr[i].joint_angle_, &jd_ptr[i].velocity_, &jd_ptr[i].effort_);
+        hardware_interface::JointStateHandle state_handle(jd_ptr[i]->joint_name_, &jd_ptr[i]->joint_angle_, &jd_ptr[i]->velocity_, &jd_ptr[i]->effort_);
         jnt_state_interface.registerHandle(state_handle);
         
     }
@@ -35,9 +40,9 @@ BlueArmInterface::BlueArmInterface(std::vector<JointData> &joint_data, double sa
 
     registerInterface(&jnt_state_interface);
 
-    for (int i=0; i < jd_ptr->size(); i++)
+    for (int i=0; i < jd_ptr.size(); i++)
     {
-        hardware_interface::JointHandle pos_handle(jnt_state_interface.getHandle(jd_ptr[i].joint_name_), &jd_ptr[i].angle_cmd_);
+        hardware_interface::JointHandle pos_handle(jnt_state_interface.getHandle(jd_ptr[i]->joint_name_), &jd_ptr[i]->angle_cmd_);
         jnt_pos_interface.registerHandle(pos_handle);
     }
     // // connect and register the joint position interface
@@ -71,23 +76,23 @@ BlueArmInterface::~BlueArmInterface()
     epos_controller.closeDevice();
 }
 
-void BlueArmInterface::checkCmdLimit(float& cmd, float& vel)
+void BlueArmInterface::checkCmdLimit(int cmd_indx)
 {
-    if(vel > jd_ptr[i].max_velocity_)
-        vel = jd_ptr[i].max_velocity_;
-    if(jd_ptr[i].angle_cmd_ > jd_ptr[i].max_angle_)
-        jd_ptr[i].angle_cmd_ = jd_ptr[i].max_angle_;
-    if(jd_ptr[i].angle_cmd_ < jd_ptr[i].min_angle_)
-        jd_ptr[i].angle_cmd_ = jd_ptr[i].min_angle_;
+    if(jd_ptr[cmd_indx]->velocity_cmd_ > jd_ptr[cmd_indx]->max_velocity_)
+        jd_ptr[cmd_indx]->velocity_cmd_ = jd_ptr[cmd_indx]->max_velocity_;
+    if(jd_ptr[cmd_indx]->angle_cmd_ > jd_ptr[cmd_indx]->max_angle_)
+        jd_ptr[cmd_indx]->angle_cmd_ = jd_ptr[cmd_indx]->max_angle_;
+    if(jd_ptr[cmd_indx]->angle_cmd_ < jd_ptr[cmd_indx]->min_angle_)
+        jd_ptr[cmd_indx]->angle_cmd_ = jd_ptr[cmd_indx]->min_angle_;
 }
 
 bool BlueArmInterface::read()
 {
     if(epos_controller.deviceOpenedCheck())
         return false;
-    for (int i=0; i < jd_ptr->size(); i++)
+    for (int i=0; i < jd_ptr.size(); i++)
     {
-        if(epos_controller.read(jd_ptr[i].joint_angle_, jd_ptr[i].velocity_, jd_ptr[i].effort_) == false)
+        if(epos_controller.read(jd_ptr[i]->id_, jd_ptr[i]->joint_angle_, jd_ptr[i]->velocity_, jd_ptr[i]->effort_) == false)
         {
             ROS_ERROR("Read Joint States Fail!!!");
             return false;
@@ -100,16 +105,30 @@ bool BlueArmInterface::write()
 {
     if(epos_controller.deviceOpenedCheck() == false)
         return false;
-    for (int i=0; i < jd_ptr->size(); i++)
+    for (int i=0; i < jd_ptr.size(); i++)
     {
-        float move_dis = fabs(jd_ptr[i].angle_cmd_ - jd_ptr[i].joint_angle_);
-        float vel = move_dis * sample_rate; // move_dis / (1 / sample_rate)
-        
-        if(epos_controller.write(jd_ptr[i].angle_cmd_, vel) == false)
+        float move_dis = fabs(jd_ptr[i]->angle_cmd_ - jd_ptr[i]->joint_angle_);
+        jd_ptr[i]->velocity_cmd_ = move_dis * sample_rate; // move_dis / (1 / sample_rate)
+        checkCmdLimit(i);
+        if(epos_controller.write(jd_ptr[i]->id_, jd_ptr[i]->angle_cmd_, jd_ptr[i]->velocity_cmd_) == false)
         {
-            ROS_ERROR("Read Joint States Fail!!!");
+            ROS_ERROR("Write Joint States Fail!!!");
             return false;
         }
     }
     return true;
+}
+
+ros::Time BlueArmInterface::get_time()
+{
+    time_now = ros::Time::now();
+    return time_now;
+}
+ros::Duration BlueArmInterface::get_period()
+{
+    period = time_now - time_last;
+    time_last = time_now;
+    return period;
+}
+
 }

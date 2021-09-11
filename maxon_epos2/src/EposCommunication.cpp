@@ -772,9 +772,9 @@ int EposCommunication::startPositionMode()
 	return lResult;
 }
 
-int EposCommunication::setPositionProfile(unsigned short p_usNodeId, float profile_velocity,
-										  float profile_acceleration = 1000,
-										  float profile_deceleration = 1000)
+int EposCommunication::setPositionProfile(unsigned short p_usNodeId, double profile_velocity,
+										  double profile_acceleration = 1000,
+										  double profile_deceleration = 1000)
 {
 	// int lResult = MMC_FAILED;
 	// unsigned int ulErrorCode = 0;
@@ -805,7 +805,7 @@ bool EposCommunication::deviceOpenedCheck()
 	return deviceOpenedCheckStatus;
 }
 
-int EposCommunication::setPosition(unsigned short p_usNodeId, float position_setpoint){
+int EposCommunication::setPosition(unsigned short p_usNodeId, double position_setpoint){
 	//Set position, call this function in service callback:
 	int lResult = MMC_SUCCESS;
 	unsigned int ulErrorCode = 0;
@@ -839,7 +839,7 @@ int EposCommunication::setPosition(unsigned short p_usNodeId, float position_set
 	return lResult;
 }
 
-int EposCommunication::getPosition(unsigned short p_usNodeId, float* pPositionIs)
+int EposCommunication::getPosition(unsigned short p_usNodeId, double* pPositionIs)
 {
 	unsigned int ulErrorCode = 0;
 	int pPositionIsCounts = 0;
@@ -866,7 +866,7 @@ int EposCommunication::getPosition(unsigned short p_usNodeId, float* pPositionIs
 	return lResult;
 }
 
-int EposCommunication::getVelocity(unsigned short p_usNodeId, float* pVelocityIs)
+int EposCommunication::getVelocity(unsigned short p_usNodeId, double* pVelocityIs)
 {
 	unsigned int ulErrorCode = 0;
 	int pVelocityIsCounts;
@@ -900,27 +900,27 @@ int EposCommunication::closeDevice(){
 	return lResult;
 }
 
-float EposCommunication::countsTomm(int* counts){
-	float mm = 2 * M_PI * (*counts) / 4096. / 100.;
+double EposCommunication::countsTomm(int* counts){
+	double mm = 2 * M_PI * (*counts) / 4096. / 100.;
 	return mm;
 }
 
-int EposCommunication::mmToCounts(float mm){
+int EposCommunication::mmToCounts(double mm){
 	int counts = mm  * 4096 * 100 / (2 * M_PI);
 	ROS_INFO_STREAM("counts: " << counts);
 	return counts;
 }
 
-int EposCommunication::radsToRpm(float rads)
+int EposCommunication::radsToRpm(double rads)
 {
 	int rpm;
 	rpm = rads * 100 * 60 / (2 * M_PI);
 	return rpm;
 }
 
-float EposCommunication::rpmToRads(int* rpm)
+double EposCommunication::rpmToRads(int* rpm)
 {
-	float rads;
+	double rads;
 	rads = (*rpm) / 100. / 60. * (2 * M_PI);
 	return rads;
 }

@@ -8,32 +8,32 @@
 //		 		 Install EPOS2 Linux Library from Maxon first!
 //============================================================================
 
-#include <ros/ros.h>
-#include "maxon_epos2/EposController.hpp"
+// #include <ros/ros.h>
+// #include "maxon_epos2/EposController.hpp"
 
-int main(int argc, char** argv)
-{
-	/*
-	 * We have a publisher, so we can not use ros::spin(), but spinOnce and sleep in a while loop instead.
-	 * spinOnce is needed for subscriber callback.
-	 */
+// int main(int argc, char** argv)
+// {
+// 	/*
+// 	 * We have a publisher, so we can not use ros::spin(), but spinOnce and sleep in a while loop instead.
+// 	 * spinOnce is needed for subscriber callback.
+// 	 */
 
-	ros::init(argc, argv, "maxon_epos2");
-	ros::NodeHandle nodeHandle("~");
-	ros::Rate loop_rate(10);
+// 	ros::init(argc, argv, "maxon_epos2");
+// 	ros::NodeHandle nodeHandle("~");
+// 	ros::Rate loop_rate(10);
 
-	//create class Object "EposController", this also initializes EPOS2
-	maxon_epos2::EposController EposController(nodeHandle);
+// 	//create class Object "EposController", this also initializes EPOS2
+// 	maxon_epos2::EposController EposController(nodeHandle);
 
-	//publish until node gets interrupted
-	while (ros::ok()){
-		EposController.publisherLoop();
-		ros::spinOnce();
-		loop_rate.sleep();
-	}
+// 	//publish until node gets interrupted
+// 	while (ros::ok()){
+// 		EposController.publisherLoop();
+// 		ros::spinOnce();
+// 		loop_rate.sleep();
+// 	}
 
-	//if node is interrupted, close device
-	EposController.closeDevice();
+// 	//if node is interrupted, close device
+// 	EposController.closeDevice();
 
-	return 0;
-}
+// 	return 0;
+// }

@@ -36,15 +36,15 @@ class EposController
    * Constructor.
    * @param nodeHandle the ROS node handle.
    */
-  EposController(ros::NodeHandle& nodeHandle);
+  // EposController(ros::NodeHandle& nodeHandle);
 
   /*!
    * Destructor.
    */
   virtual ~EposController();
   bool deviceOpenedCheck();
-  bool read(int id, float& pos, float& vel, float& eff);
-  bool write(int id, float& cmd, float& vel);
+  bool read(int id, double& pos, double& vel, double& eff);
+  bool write(int id, double& cmd, double& vel);
   void publisherLoop();
   void closeDevice();
 
@@ -53,12 +53,12 @@ class EposController
    * Reads and verifies the ROS parameters.
    * @return true if successful.
    */
-  bool readParameters();
+  // bool readParameters();
   bool homingCallback(std_srvs::Trigger::Request& request, std_srvs::Trigger::Response& response);
   bool serviceCallback(maxon_epos2::epos_motor_service::Request& request, maxon_epos2::epos_motor_service::Response& response);
 
   //! ROS node handle.
-  ros::NodeHandle& nodeHandle_;
+  // ros::NodeHandle& nodeHandle_;
 
   //! ROS topic publisher.
   ros::Publisher publisher_;

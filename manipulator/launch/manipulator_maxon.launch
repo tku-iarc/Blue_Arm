@@ -5,9 +5,11 @@
   	<rosparam command="load" file="$(find maxon_epos2)/config/default.yaml" />
   </node> -->
   <param name="robot_description" textfile="$(find blue_arm_description)/urdf/blue_arm.xacro" />
-  <rosparam file="$(find blue_arm_moveit)/config/ros_controllers.yaml"/>
-  <node name="blue_arm" pkg="manipulator" type="manipulator_node" output="screen">
+  
+  <!-- <rosparam file="$(find manipulator)/config/ros_controllers.yaml" command="load"/> -->
+  <node name="blue_arm_control" pkg="manipulator" type="manipulator_node" output="screen">
     <param name="hw_interface" type="bool" value="$(arg hw_interface)"/>
   </node>
+  <include file="$(find manipulator)/launch/ros_controllers.launch"/>
 
 </launch>

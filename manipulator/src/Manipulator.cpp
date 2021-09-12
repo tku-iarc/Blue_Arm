@@ -1,14 +1,15 @@
 #include "manipulator/Manipulator.h"
 
-Manipulator::Manipulator()
+Manipulator::Manipulator(ros::NodeHandle& nodeHandle)
+    :nodeHandle_(nodeHandle)
 {
-    sample_rate = 100;
+    sample_rate = 10;
     arm_state = Disable;
     joint_data_init();
     blue_arm_interface = new hardware_interface::BlueArmInterface(this->joint_data, sample_rate);
-    blue_arm_cm = new controller_manager::ControllerManager(blue_arm_interface);
-    bool load_controller = blue_arm_cm->loadController("blue_arm_controller");
-    std::cout<<"!!!!!!!!!!!!!!!!!!!!!!! "<<load_controller<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
+    blue_arm_cm = new controller_manager::ControllerManager(blue_arm_interface, nodeHandle);
+    // bool load_controller = blue_arm_cm->loadController("blue_arm_controller");
+    // std::cout<<"!!!!!!!!!!!!!!!!!!!!!!! "<<load_controller<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
 }
 
 // Manipulator::Manipulator(ros::NodeHandle& nodeHandle)
@@ -213,9 +214,10 @@ void Manipulator::statePublisher()
     msg.state = arm_state;
     // arm_state_pub.publish(msg);
 }
-void Manipulator::process()
+void Manipulator::process(ros::Rate& loop_rate)
 {
     blue_arm_interface->read();
-    blue_arm_cm->update(blue_arm_interface->get_time(), blue_arm_interface->get_period());
+    blue_arm_cm->update(ros::Time::now(), loop_rate.expectedCycleTime());
     blue_arm_interface->write();
+    std::cout<<"joint data in process: "<<joint_data[0]->joint_angle_<<", "<<joint_data[0]->angle_cmd_<<std::endl;
 }

@@ -103,6 +103,7 @@ bool BlueArmInterface::read()
 
 bool BlueArmInterface::write()
 {
+    std::cout<<"joint data in write: "<<jd_ptr[0]->joint_angle_<<", "<<jd_ptr[0]->angle_cmd_<<std::endl;
     if(epos_controller.deviceOpenedCheck() == false)
         return false;
     for (int i=0; i < jd_ptr.size(); i++)
@@ -128,6 +129,7 @@ ros::Duration BlueArmInterface::get_period()
 {
     period = time_now - time_last;
     time_last = time_now;
+    std::cout<<"period = "<<period<<std::endl;
     return period;
 }
 

@@ -31,7 +31,7 @@ private:
     hardware_interface::BlueArmInterface* blue_arm_interface;
     controller_manager::ControllerManager* blue_arm_cm;
 
-    // ros::NodeHandle& nodeHandle_;
+    ros::NodeHandle& nodeHandle_;
 
     // //! ROS topic Pub.
     // ros::Publisher arm_state_pub;
@@ -50,7 +50,7 @@ private:
 
 
 public:
-    Manipulator();
+    Manipulator(ros::NodeHandle& nodeHandle);
     // Manipulator(ros::NodeHandle& nodeHandle);
     ~Manipulator();
     void joint_state_cb(const maxon_epos2::epos_motor_info::ConstPtr &msg);
@@ -59,7 +59,7 @@ public:
     bool line_move_cb(manipulator::JointMove::Request &req, manipulator::JointMove::Response &res);
     bool kinematics();
     void statePublisher();
-    void process();
+    void process(ros::Rate& loop_rate);
     std::vector<JointData*> joint_data;
     float sample_rate;
 };

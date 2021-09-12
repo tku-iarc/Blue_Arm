@@ -76,34 +76,47 @@ BlueArmInterface::~BlueArmInterface()
     epos_controller.closeDevice();
 }
 
+void BlueArmInterface::closeDevice()
+{
+    epos_controller.closeDevice();
+    std::cout<<"Device closed!!!!!!!!!!!!"<<std::endl;
+    return;
+}
+
 void BlueArmInterface::checkCmdLimit(int cmd_indx)
 {
     if(jd_ptr[cmd_indx]->velocity_cmd_ > jd_ptr[cmd_indx]->max_velocity_)
+    {
         jd_ptr[cmd_indx]->velocity_cmd_ = jd_ptr[cmd_indx]->max_velocity_;
+        std::cout<<"FUCK"<<std::endl;
+    }
     if(jd_ptr[cmd_indx]->angle_cmd_ > jd_ptr[cmd_indx]->max_angle_)
         jd_ptr[cmd_indx]->angle_cmd_ = jd_ptr[cmd_indx]->max_angle_;
     if(jd_ptr[cmd_indx]->angle_cmd_ < jd_ptr[cmd_indx]->min_angle_)
         jd_ptr[cmd_indx]->angle_cmd_ = jd_ptr[cmd_indx]->min_angle_;
+    return;
 }
 
 bool BlueArmInterface::read()
 {
-    if(epos_controller.deviceOpenedCheck())
+    if(epos_controller.deviceOpenedCheck() == false)
         return false;
     for (int i=0; i < jd_ptr.size(); i++)
     {
-        if(epos_controller.read(jd_ptr[i]->id_, jd_ptr[i]->joint_angle_, jd_ptr[i]->velocity_, jd_ptr[i]->effort_) == false)
+        if(epos_controller.read(jd_ptr[i]->id_, jd_ptr[i]->joint_angle_, jd_ptr[i]->velocity_, jd_ptr[i]->effort_,  jd_ptr[i]->home_offset_) == false)
         {
             ROS_ERROR("Read Joint States Fail!!!");
             return false;
         }
+        // std::cout<<jd_ptr[i]->joint_angle_<<", ";
     }
+    // std::cout<<std::endl;
     return true;
 }
 
 bool BlueArmInterface::write()
 {
-    std::cout<<"joint data in write: "<<jd_ptr[0]->joint_angle_<<", "<<jd_ptr[0]->angle_cmd_<<std::endl;
+    // std::cout<<"joint data in write: "<<jd_ptr[3]->joint_angle_<<", "<<jd_ptr[3]->angle_cmd_<<std::endl;
     if(epos_controller.deviceOpenedCheck() == false)
         return false;
     for (int i=0; i < jd_ptr.size(); i++)
@@ -111,7 +124,7 @@ bool BlueArmInterface::write()
         float move_dis = fabs(jd_ptr[i]->angle_cmd_ - jd_ptr[i]->joint_angle_);
         jd_ptr[i]->velocity_cmd_ = move_dis * sample_rate; // move_dis / (1 / sample_rate)
         checkCmdLimit(i);
-        if(epos_controller.write(jd_ptr[i]->id_, jd_ptr[i]->angle_cmd_, jd_ptr[i]->velocity_cmd_) == false)
+        if(epos_controller.write(jd_ptr[i]->id_, jd_ptr[i]->angle_cmd_, jd_ptr[i]->velocity_cmd_, jd_ptr[i]->home_offset_) == false)
         {
             ROS_ERROR("Write Joint States Fail!!!");
             return false;

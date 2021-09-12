@@ -3,7 +3,7 @@
 Manipulator::Manipulator(ros::NodeHandle& nodeHandle)
     :nodeHandle_(nodeHandle)
 {
-    sample_rate = 10;
+    sample_rate = 3;
     arm_state = Disable;
     joint_data_init();
     blue_arm_interface = new hardware_interface::BlueArmInterface(this->joint_data, sample_rate);
@@ -35,7 +35,8 @@ Manipulator::Manipulator(ros::NodeHandle& nodeHandle)
 
 Manipulator::~Manipulator()
 {
-
+    delete blue_arm_interface;
+    delete blue_arm_cm;
 }
 
 void Manipulator::joint_data_init()
@@ -53,12 +54,13 @@ void Manipulator::joint_data_init()
     joint_data[0]->angle_cmd_    = 0;
     joint_data[0]->velocity_cmd_ = 0;
     joint_data[0]->effort_       = 0;
+    joint_data[0]->home_offset_  = 0;
 
     joint_data.push_back(new JointData());
     joint_data[1]->id_           = 2;
     joint_data[1]->joint_name_   = "joint_2";
     joint_data[1]->joint_angle_  = 0;
-    joint_data[1]->min_angle_    = -1 * M_PI;
+    joint_data[1]->min_angle_    = 0;
     joint_data[1]->max_angle_    = M_PI;
     joint_data[1]->max_velocity_ = M_PI / 12;
     joint_data[1]->velocity_     = 0;
@@ -67,6 +69,7 @@ void Manipulator::joint_data_init()
     joint_data[1]->angle_cmd_    = 0;
     joint_data[1]->velocity_cmd_ = 0;
     joint_data[1]->effort_       = 0;
+    joint_data[0]->home_offset_  = 0;
 
     joint_data.push_back(new JointData());
     joint_data[2]->id_           = 3;
@@ -78,23 +81,25 @@ void Manipulator::joint_data_init()
     joint_data[2]->velocity_     = 0;
     joint_data[2]->acceleration_ = 0;
     joint_data[2]->deceleration_ = 0;
-    joint_data[2]->angle_cmd_    = 0;
+    joint_data[2]->angle_cmd_    = M_PI;
     joint_data[2]->velocity_cmd_ = 0;
     joint_data[2]->effort_       = 0;
+    joint_data[2]->home_offset_  = M_PI;
 
     joint_data.push_back(new JointData());
     joint_data[3]->id_           = 4;
     joint_data[3]->joint_name_   = "joint_4";
     joint_data[3]->joint_angle_  = 0;
     joint_data[3]->min_angle_    = -1 * M_PI;
-    joint_data[3]->max_angle_    = M_PI;
+    joint_data[3]->max_angle_    = 0;
     joint_data[3]->max_velocity_ = M_PI / 12;
     joint_data[3]->velocity_     = 0;
     joint_data[3]->acceleration_ = 0;
     joint_data[3]->deceleration_ = 0;
-    joint_data[3]->angle_cmd_    = 0;
+    joint_data[3]->angle_cmd_    = -1 * M_PI;
     joint_data[3]->velocity_cmd_ = 0;
     joint_data[3]->effort_       = 0;
+    joint_data[3]->home_offset_  = -1 * M_PI;
 
     joint_data.push_back(new JointData());
     joint_data[4]->id_           = 5;
@@ -109,13 +114,14 @@ void Manipulator::joint_data_init()
     joint_data[4]->angle_cmd_    = 0;
     joint_data[4]->velocity_cmd_ = 0;
     joint_data[4]->effort_       = 0;
+    joint_data[4]->home_offset_  = 0;
 
     joint_data.push_back(new JointData());
     joint_data[5]->id_           = 6;
     joint_data[5]->joint_name_   = "joint_6";
     joint_data[5]->joint_angle_  = 0;
-    joint_data[5]->min_angle_    = -1 * M_PI;
-    joint_data[5]->max_angle_    = M_PI;
+    joint_data[5]->min_angle_    = -1.7;
+    joint_data[5]->max_angle_    = 1.7;
     joint_data[5]->max_velocity_ = M_PI / 12;
     joint_data[5]->velocity_     = 0;
     joint_data[5]->acceleration_ = 0;
@@ -123,6 +129,7 @@ void Manipulator::joint_data_init()
     joint_data[5]->angle_cmd_    = 0;
     joint_data[5]->velocity_cmd_ = 0;
     joint_data[5]->effort_       = 0;
+    joint_data[5]->home_offset_  = 0;
 
     joint_data.push_back(new JointData());
     joint_data[6]->id_           = 7;
@@ -137,6 +144,7 @@ void Manipulator::joint_data_init()
     joint_data[6]->angle_cmd_    = 0;
     joint_data[6]->velocity_cmd_ = 0;
     joint_data[6]->effort_       = 0;
+    joint_data[6]->home_offset_  = 0;
 }
 
 void Manipulator::joint_state_cb(const maxon_epos2::epos_motor_info::ConstPtr &msg)
@@ -214,10 +222,20 @@ void Manipulator::statePublisher()
     msg.state = arm_state;
     // arm_state_pub.publish(msg);
 }
+void Manipulator::closeDevice()
+{
+    blue_arm_interface->closeDevice();
+    return;
+}
 void Manipulator::process(ros::Rate& loop_rate)
 {
+    ros::Time t1 = ros::Time::now();
     blue_arm_interface->read();
+    ros::Time t2 = ros::Time::now();
     blue_arm_cm->update(ros::Time::now(), loop_rate.expectedCycleTime());
+    ros::Time t3 = ros::Time::now();
     blue_arm_interface->write();
-    std::cout<<"joint data in process: "<<joint_data[0]->joint_angle_<<", "<<joint_data[0]->angle_cmd_<<std::endl;
+    ros::Time t4 = ros::Time::now();
+    std::cout<<"go once"<<(t2-t1).toSec()<<", "<<(t3-t2).toSec()<<", "<<(t4-t3).toSec()<<std::endl;
+    return;
 }

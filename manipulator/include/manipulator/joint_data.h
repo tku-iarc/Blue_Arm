@@ -19,4 +19,5 @@ public:
     double angle_cmd_;
     double velocity_cmd_;
     double effort_;
+    double home_offset_;
 } JointData;

@@ -54,9 +54,10 @@ bool EposController::deviceOpenedCheck()
 	return epos_device_.deviceOpenedCheck() == MMC_SUCCESS;
 }
 
-bool EposController::read(int id, double& pos, double& vel, double& eff)
+bool EposController::read(int id, double& pos, double& vel, double& eff, double offset)
 {
-	if(epos_device_.getPosition(id, &pos) == MMC_FAILED)
+	double contorller_pos = 0;
+	if(epos_device_.getPosition(id, &contorller_pos) == MMC_FAILED)
 	{
 		ROS_ERROR("Get position failed");
 		return false;
@@ -66,6 +67,7 @@ bool EposController::read(int id, double& pos, double& vel, double& eff)
 		ROS_ERROR("Get velocity failed");
 		return false;
 	}
+	pos = contorller_pos + offset;
 	eff = 0;
 	return true;
 	// if((epos_device_.deviceOpenedCheck()) == MMC_SUCCESS)
@@ -82,14 +84,15 @@ bool EposController::read(int id, double& pos, double& vel, double& eff)
 	// return true;
 }
 
-bool EposController::write(int id, double& cmd, double& vel)
+bool EposController::write(int id, double& cmd, double& vel, double offset)
 {
-	if(epos_device_.setPositionProfile(id, vel, 2 * vel, 2 * vel)==MMC_FAILED)
+
+	if(epos_device_.setPositionProfile(id, vel, 4 * vel, 4 * vel)==MMC_FAILED)
 	{
-		ROS_ERROR("Seting position profile failed");
+		ROS_ERROR_STREAM("Seting position profile failed, vel = "<<vel);
 		return false;
 	}
-	if(epos_device_.setPosition(id, cmd)==MMC_FAILED)
+	if(epos_device_.setPosition(id, cmd - offset)==MMC_FAILED)
 	{
 		ROS_ERROR("Seting position failed");
 		return false;

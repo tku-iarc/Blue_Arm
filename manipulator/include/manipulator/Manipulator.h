@@ -59,6 +59,7 @@ public:
     bool line_move_cb(manipulator::JointMove::Request &req, manipulator::JointMove::Response &res);
     bool kinematics();
     void statePublisher();
+    void closeDevice();
     void process(ros::Rate& loop_rate);
     std::vector<JointData*> joint_data;
     float sample_rate;

@@ -1,23 +1,43 @@
-// #include <ros/ros.h>
+#include <ros/ros.h>
+#include <signal.h>
 #include "manipulator/Manipulator.h"
 #include "maxon_epos2/EposController.hpp"
 
+Manipulator* blue_arm;
+
+void sigintHandler(int sig)
+{
+  // Do some custom action.
+  // For example, publish a stop message to some other nodes.
+  blue_arm->closeDevice();
+  delete blue_arm;
+  // All the default sigint handler does is call shutdown()
+  ros::shutdown();
+}
 
 int main(int argc, char** argv)
 {
-	ros::init(argc, argv, "blue_arm_control");
+	ros::init(argc, argv, "blue_arm_control", ros::init_options::NoSigintHandler);
 	ros::AsyncSpinner spinner(1);
     spinner.start();
 	ros::NodeHandle nodeHandle;
+	ros::Time start = ros::Time::now();
+	ros::Time test1 = ros::Time::now();
+	ros::Time test = ros::Time::now();
 
-	Manipulator blue_arm(nodeHandle);
-	ros::Rate loop_rate(blue_arm.sample_rate);
+	signal(SIGINT, sigintHandler);
+
+	blue_arm = new Manipulator(nodeHandle);
+
+	ros::Rate loop_rate(blue_arm->sample_rate);
 	while (ros::ok()){
-		blue_arm.process(loop_rate);
+		test1 = ros::Time::now();
+		blue_arm->process(loop_rate);
+		test = ros::Time::now();
+		std::cout<<"go time = "<<(test - start).toSec()<<"spend "<<(test - test1).toSec()<<std::endl;
 		ros::spinOnce();
 		loop_rate.sleep();
 	}
-	
 	spinner.stop();
 	return 0;
 }

@@ -116,8 +116,10 @@ int EposCommunication::SetPositionProfile(HANDLE p_DeviceHandle, unsigned short 
 {
 	//to use set variables below first!
 	int lResult = MMC_SUCCESS;
-
-	if(VCS_SetPositionProfile(p_DeviceHandle, p_usNodeId, radsToRpm(profile_velocity), radsToRpm(profile_acceleration), radsToRpm(profile_deceleration), p_pErrorCode) == MMC_FAILED)
+	int vel_rpm = radsToRpm(profile_velocity);
+	if(vel_rpm == 0)
+		return lResult;
+	if(VCS_SetPositionProfile(p_DeviceHandle, p_usNodeId, vel_rpm, radsToRpm(profile_acceleration), radsToRpm(profile_deceleration), p_pErrorCode) == MMC_FAILED)
 	{
 		LogError("VCS_SetPositionProfile", lResult, *p_pErrorCode);
 		lResult = MMC_FAILED;
@@ -460,9 +462,9 @@ int EposCommunication::SetPosition(HANDLE p_DeviceHandle, unsigned short p_usNod
 {
 	// absolute position, starts immediately
 	int lResult = MMC_SUCCESS;
-	std::stringstream msg;
-	msg << "move to position = " << position_setpoint << ", node = " << g_usNodeId;
-	LogInfo(msg.str());
+	// std::stringstream msg;
+	// msg << "move to position = " << position_setpoint << ", node = " << g_usNodeId;
+	// LogInfo(msg.str());
 	bool absolute = true;
 
 	if(VCS_MoveToPosition(p_DeviceHandle, p_usNodeId, position_setpoint, absolute, 1, p_pErrorCode) == MMC_FAILED)
@@ -472,7 +474,7 @@ int EposCommunication::SetPosition(HANDLE p_DeviceHandle, unsigned short p_usNod
 		std::cout<<"Fuck Fail_1"<<std::endl;
 	}
 	else{
-		ROS_INFO("Movement executed.");
+		// ROS_INFO("Movement executed.");
 	}
 
 	return lResult;
@@ -659,7 +661,7 @@ int EposCommunication::initialization(unsigned short *nodeIdList, int motors){
 	// {
 	// 	LogError("SetHomingParameter", lResult, ulErrorCode);
 	// }
-
+	
 	//Prepare EPOS controller:
 	if((lResult = PrepareEpos(g_pKeyHandle, g_usNodeId, &ulErrorCode))==MMC_FAILED)
 	{
@@ -708,8 +710,35 @@ int EposCommunication::initialization(unsigned short *nodeIdList, int motors){
 			// }
 		}
 	}
+	// for(int i = 1; i <= g_motors; i++)
+	// {
+	// 	if((lResult = setHomingParameter(i, &ulErrorCode))==MMC_FAILED)
+	// 	{
+	// 		LogError("SetHomingParameter", lResult, ulErrorCode);
+	// 	}
+	// }
 
 	LogInfo("Initialization successful");
+
+	return lResult;
+}
+
+int EposCommunication::setHomingParameter(unsigned short p_usNodeId, unsigned int* p_pErrorCode)
+{
+	//to use set variables below first!
+	int lResult = MMC_SUCCESS;
+	unsigned int homing_acceleration = 20;
+	unsigned int speed_switch = 50;
+	unsigned int speed_index = 50;
+	int home_offset = mmToCounts(0.5);
+	unsigned short current_threshold = 0;
+	int home_position = mmToCounts(0.5);
+	HANDLE p_DeviceHandle = (p_usNodeId == g_usNodeId) ? g_pKeyHandle : g_pSubKeyHandle;
+	if(VCS_SetHomingParameter(p_DeviceHandle, p_usNodeId, homing_acceleration, speed_switch, speed_index, home_offset, current_threshold, home_position, p_pErrorCode) == MMC_FAILED)
+	{
+		lResult = MMC_FAILED;
+		LogError("VCS_SetHomingParameter", lResult, *p_pErrorCode);
+	}
 
 	return lResult;
 }
@@ -791,10 +820,15 @@ int EposCommunication::setPositionProfile(unsigned short p_usNodeId, double prof
 	int lResult = MMC_SUCCESS;
 	HANDLE p_DeviceHandle = (p_usNodeId == g_usNodeId) ? g_pKeyHandle : g_pSubKeyHandle;
 
-	if(VCS_SetPositionProfile(p_DeviceHandle, p_usNodeId, radsToRpm(profile_velocity), radsToRpm(profile_acceleration), radsToRpm(profile_deceleration), &ulErrorCode) == MMC_FAILED)
+	int vel_rpm = radsToRpm(profile_velocity);
+	if(vel_rpm == 0)
+		return lResult;
+
+	if(VCS_SetPositionProfile(p_DeviceHandle, p_usNodeId, vel_rpm, radsToRpm(profile_acceleration), radsToRpm(profile_deceleration), &ulErrorCode) == MMC_FAILED)
 	{
-		LogError("VCS_SetPositionProfile", lResult, ulErrorCode, p_usNodeId);
 		lResult = MMC_FAILED;
+		LogError("VCS_SetPositionProfile", lResult, ulErrorCode, p_usNodeId);
+		std::cout<< "radsToRpm(profile_velocity) = "<< radsToRpm(profile_velocity)<<std::endl;
 	}
 
 	return lResult;
@@ -812,7 +846,7 @@ int EposCommunication::setPosition(unsigned short p_usNodeId, double position_se
 	HANDLE p_DeviceHandle = (p_usNodeId == g_usNodeId) ? g_pKeyHandle : g_pSubKeyHandle;
 
 	//Safety check setpoint and homing:
-	if(position_setpoint <= M_PI / 2 & position_setpoint >= -1 * M_PI / 2)
+	if(position_setpoint <= M_PI && position_setpoint >= -1 * M_PI)
 	{
 		// if((lResult = SetPosition(p_DeviceHandle, p_usNodeId, mmToCounts(position_setpoint), &ulErrorCode))==MMC_FAILED)
 		// {
@@ -822,18 +856,18 @@ int EposCommunication::setPosition(unsigned short p_usNodeId, double position_se
 		// else{
 		// 	ROS_INFO("SetPosition executed.");
 		// }
-		std::stringstream msg;
-		msg << "move to position = " << position_setpoint << ", node = " << g_usNodeId;
-		LogInfo(msg.str());
+		// std::stringstream msg;
+		// msg << "move to position = " << position_setpoint << ", node = " << g_usNodeId;
+		// LogInfo(msg.str());
 		bool absolute = true;
 
 		if(VCS_MoveToPosition(p_DeviceHandle, p_usNodeId, mmToCounts(position_setpoint), absolute, 1, &ulErrorCode) == MMC_FAILED)
 		{
-			LogError("VCS_MoveToPosition", lResult, ulErrorCode, p_usNodeId);
 			lResult = MMC_FAILED;
+			LogError("VCS_MoveToPosition", lResult, ulErrorCode, p_usNodeId);
 		}
 		else{
-			ROS_INFO("Movement executed.");
+			// ROS_INFO("Movement executed.");
 		}
 	}
 	return lResult;
@@ -855,8 +889,8 @@ int EposCommunication::getPosition(unsigned short p_usNodeId, double* pPositionI
 
 	if(VCS_GetPositionIs(p_DeviceHandle, p_usNodeId, &pPositionIsCounts, &ulErrorCode) == MMC_FAILED)
 	{
-		LogError("VCS_GetPositionIs", lResult, ulErrorCode, p_usNodeId);
 		lResult = MMC_FAILED;
+		LogError("VCS_GetPositionIs", lResult, ulErrorCode, p_usNodeId);
 	}
 
 	*pPositionIs = countsTomm(&pPositionIsCounts);
@@ -880,8 +914,8 @@ int EposCommunication::getVelocity(unsigned short p_usNodeId, double* pVelocityI
 
 	if(VCS_GetVelocityIs(p_DeviceHandle, p_usNodeId, &pVelocityIsCounts, &ulErrorCode) == MMC_FAILED)
 	{
-		LogError("VCS_GetVelocityIs", lResult, ulErrorCode, p_usNodeId);
 		lResult = MMC_FAILED;
+		LogError("VCS_GetVelocityIs", lResult, ulErrorCode, p_usNodeId);
 	}
 	*pVelocityIs = rpmToRads(&pVelocityIsCounts);
 	return lResult;
@@ -901,13 +935,13 @@ int EposCommunication::closeDevice(){
 }
 
 double EposCommunication::countsTomm(int* counts){
-	double mm = 2 * M_PI * (*counts) / 4096. / 100.;
+	double mm = -1 * 2 * M_PI * (*counts) / 4096. / 100.;
 	return mm;
 }
 
 int EposCommunication::mmToCounts(double mm){
-	int counts = mm  * 4096 * 100 / (2 * M_PI);
-	ROS_INFO_STREAM("counts: " << counts);
+	int counts = -1 * mm  * 4096 * 100 / (2 * M_PI);
+	// ROS_INFO_STREAM("counts: " << counts);
 	return counts;
 }
 

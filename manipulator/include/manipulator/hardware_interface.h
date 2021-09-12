@@ -14,8 +14,9 @@ class BlueArmInterface : public hardware_interface::RobotHW
 public:
   BlueArmInterface(std::vector<JointData*>& joint_data, float sample_rate);
   ~BlueArmInterface();
-  bool read(void);
-  bool write(void);
+  bool read();
+  bool write();
+  void closeDevice();
   ros::Time get_time();
   ros::Duration get_period();
   float sample_rate;

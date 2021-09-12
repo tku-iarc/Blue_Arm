@@ -69,6 +69,7 @@ class EposCommunication
   bool 	deviceOpenedCheck();
   int 	homing();
   int 	startPositionMode();
+  int   setHomingParameter(unsigned short p_usNodeId, unsigned int* p_pErrorCode);
   int   setPositionProfile(unsigned short p_usNodeId,
                            double profile_velocity,
 										       double profile_acceleration,

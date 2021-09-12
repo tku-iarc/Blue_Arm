@@ -43,8 +43,8 @@ class EposController
    */
   virtual ~EposController();
   bool deviceOpenedCheck();
-  bool read(int id, double& pos, double& vel, double& eff);
-  bool write(int id, double& cmd, double& vel);
+  bool read(int id, double& pos, double& vel, double& eff, double offset=0);
+  bool write(int id, double& cmd, double& vel, double offset=0);
   void publisherLoop();
   void closeDevice();
 

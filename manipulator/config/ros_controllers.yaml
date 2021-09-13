@@ -64,8 +64,8 @@ blue_arm_controller:
       joint_6: {trajectory: 0.1, goal: 0.1}
       joint_7: {trajectory: 0.1, goal: 0.1}
   stop_trajectory_duration: 0.5
-  state_publish_rate:  3
-  action_monitor_rate: 3
+  state_publish_rate:  25
+  action_monitor_rate: 25
   gains:
     joint_1:
       p: 1000

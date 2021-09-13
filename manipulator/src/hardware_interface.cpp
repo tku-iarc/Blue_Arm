@@ -86,10 +86,7 @@ void BlueArmInterface::closeDevice()
 void BlueArmInterface::checkCmdLimit(int cmd_indx)
 {
     if(jd_ptr[cmd_indx]->velocity_cmd_ > jd_ptr[cmd_indx]->max_velocity_)
-    {
         jd_ptr[cmd_indx]->velocity_cmd_ = jd_ptr[cmd_indx]->max_velocity_;
-        std::cout<<"FUCK"<<std::endl;
-    }
     if(jd_ptr[cmd_indx]->angle_cmd_ > jd_ptr[cmd_indx]->max_angle_)
         jd_ptr[cmd_indx]->angle_cmd_ = jd_ptr[cmd_indx]->max_angle_;
     if(jd_ptr[cmd_indx]->angle_cmd_ < jd_ptr[cmd_indx]->min_angle_)
@@ -99,15 +96,18 @@ void BlueArmInterface::checkCmdLimit(int cmd_indx)
 
 bool BlueArmInterface::read()
 {
-    if(epos_controller.deviceOpenedCheck() == false)
-        return false;
+    // if(epos_controller.deviceOpenedCheck() == false)
+    //     return false;
     for (int i=0; i < jd_ptr.size(); i++)
     {
-        if(epos_controller.read(jd_ptr[i]->id_, jd_ptr[i]->joint_angle_, jd_ptr[i]->velocity_, jd_ptr[i]->effort_,  jd_ptr[i]->home_offset_) == false)
-        {
-            ROS_ERROR("Read Joint States Fail!!!");
-            return false;
-        }
+        jd_ptr[i]->joint_angle_ = jd_ptr[i]->angle_cmd_;
+        jd_ptr[i]->velocity_ = 0;
+        jd_ptr[i]->effort_ = 0;
+        // if(epos_controller.read(jd_ptr[i]->id_, jd_ptr[i]->joint_angle_, jd_ptr[i]->velocity_, jd_ptr[i]->effort_,  jd_ptr[i]->home_offset_) == false)
+        // {
+        //     ROS_ERROR("Read Joint States Fail!!!");
+        //     return false;
+        // }
         // std::cout<<jd_ptr[i]->joint_angle_<<", ";
     }
     // std::cout<<std::endl;

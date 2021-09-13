@@ -3,7 +3,7 @@
 Manipulator::Manipulator(ros::NodeHandle& nodeHandle)
     :nodeHandle_(nodeHandle)
 {
-    sample_rate = 3;
+    sample_rate = 25;
     arm_state = Disable;
     joint_data_init();
     blue_arm_interface = new hardware_interface::BlueArmInterface(this->joint_data, sample_rate);
@@ -47,7 +47,7 @@ void Manipulator::joint_data_init()
     joint_data[0]->joint_angle_  = 0;
     joint_data[0]->min_angle_    = -1 * M_PI;
     joint_data[0]->max_angle_    = M_PI;
-    joint_data[0]->max_velocity_ = M_PI / 12;
+    joint_data[0]->max_velocity_ = 1.165 * M_PI * 0.9;
     joint_data[0]->velocity_     = 0;
     joint_data[0]->acceleration_ = 0;
     joint_data[0]->deceleration_ = 0;
@@ -62,7 +62,7 @@ void Manipulator::joint_data_init()
     joint_data[1]->joint_angle_  = 0;
     joint_data[1]->min_angle_    = 0;
     joint_data[1]->max_angle_    = M_PI;
-    joint_data[1]->max_velocity_ = M_PI / 12;
+    joint_data[1]->max_velocity_ = 1.165 * M_PI * 0.9;
     joint_data[1]->velocity_     = 0;
     joint_data[1]->acceleration_ = 0;
     joint_data[1]->deceleration_ = 0;
@@ -77,7 +77,7 @@ void Manipulator::joint_data_init()
     joint_data[2]->joint_angle_  = 0;
     joint_data[2]->min_angle_    = -1 * M_PI;
     joint_data[2]->max_angle_    = M_PI;
-    joint_data[2]->max_velocity_ = M_PI / 12;
+    joint_data[2]->max_velocity_ = 0.846 * M_PI * 0.9;
     joint_data[2]->velocity_     = 0;
     joint_data[2]->acceleration_ = 0;
     joint_data[2]->deceleration_ = 0;
@@ -92,7 +92,7 @@ void Manipulator::joint_data_init()
     joint_data[3]->joint_angle_  = 0;
     joint_data[3]->min_angle_    = -1 * M_PI;
     joint_data[3]->max_angle_    = 0;
-    joint_data[3]->max_velocity_ = M_PI / 12;
+    joint_data[3]->max_velocity_ = 0.846 * M_PI * 0.9;
     joint_data[3]->velocity_     = 0;
     joint_data[3]->acceleration_ = 0;
     joint_data[3]->deceleration_ = 0;
@@ -107,7 +107,7 @@ void Manipulator::joint_data_init()
     joint_data[4]->joint_angle_  = 0;
     joint_data[4]->min_angle_    = -1 * M_PI;
     joint_data[4]->max_angle_    = M_PI;
-    joint_data[4]->max_velocity_ = M_PI / 12;
+    joint_data[4]->max_velocity_ = 0.846 * M_PI * 0.9;
     joint_data[4]->velocity_     = 0;
     joint_data[4]->acceleration_ = 0;
     joint_data[4]->deceleration_ = 0;
@@ -122,7 +122,7 @@ void Manipulator::joint_data_init()
     joint_data[5]->joint_angle_  = 0;
     joint_data[5]->min_angle_    = -1.7;
     joint_data[5]->max_angle_    = 1.7;
-    joint_data[5]->max_velocity_ = M_PI / 12;
+    joint_data[5]->max_velocity_ = 0.98 * M_PI * 0.9;
     joint_data[5]->velocity_     = 0;
     joint_data[5]->acceleration_ = 0;
     joint_data[5]->deceleration_ = 0;
@@ -137,7 +137,7 @@ void Manipulator::joint_data_init()
     joint_data[6]->joint_angle_  = 0;
     joint_data[6]->min_angle_    = -1 * M_PI;
     joint_data[6]->max_angle_    = M_PI;
-    joint_data[6]->max_velocity_ = M_PI / 12;
+    joint_data[6]->max_velocity_ = 0.98 * M_PI * 0.9;
     joint_data[6]->velocity_     = 0;
     joint_data[6]->acceleration_ = 0;
     joint_data[6]->deceleration_ = 0;
@@ -229,13 +229,13 @@ void Manipulator::closeDevice()
 }
 void Manipulator::process(ros::Rate& loop_rate)
 {
-    ros::Time t1 = ros::Time::now();
+    // ros::Time t1 = ros::Time::now();
     blue_arm_interface->read();
-    ros::Time t2 = ros::Time::now();
+    // ros::Time t2 = ros::Time::now();
     blue_arm_cm->update(ros::Time::now(), loop_rate.expectedCycleTime());
-    ros::Time t3 = ros::Time::now();
+    // ros::Time t3 = ros::Time::now();
     blue_arm_interface->write();
-    ros::Time t4 = ros::Time::now();
-    std::cout<<"go once"<<(t2-t1).toSec()<<", "<<(t3-t2).toSec()<<", "<<(t4-t3).toSec()<<std::endl;
+    // ros::Time t4 = ros::Time::now();
+    // std::cout<<"go once"<<(t2-t1).toSec()<<", "<<(t3-t2).toSec()<<", "<<(t4-t3).toSec()<<std::endl;
     return;
 }

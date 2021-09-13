@@ -34,7 +34,7 @@ int main(int argc, char** argv)
 		test1 = ros::Time::now();
 		blue_arm->process(loop_rate);
 		test = ros::Time::now();
-		std::cout<<"go time = "<<(test - start).toSec()<<"spend "<<(test - test1).toSec()<<std::endl;
+		// std::cout<<"go time = "<<(test - start).toSec()<<"spend "<<(test - test1).toSec()<<std::endl;
 		ros::spinOnce();
 		loop_rate.sleep();
 	}

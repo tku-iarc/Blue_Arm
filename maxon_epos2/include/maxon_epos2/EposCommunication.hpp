@@ -75,6 +75,7 @@ class EposCommunication
 										       double profile_acceleration,
 										       double profile_deceleration);
   int 	setPosition(unsigned short p_usNodeI, double position_setpoint);
+  int   setPositionMust(unsigned short p_usNodeId, double position_setpoint);
   int 	getPosition(unsigned short p_usNodeI, double* pPositionIs);
   int 	getVelocity(unsigned short p_usNodeI, double* pVelocityIs);
   int 	closeDevice();
@@ -122,6 +123,7 @@ class EposCommunication
   // int	  PositionMode(unsigned int* p_pErrorCode);
   int 	HomingMode(unsigned int* p_pErrorCode);
   int	  ActivateProfilePositionMode(HANDLE p_DeviceHandle, unsigned short p_usNodeId, unsigned int* p_pErrorCode);
+  int   ActivatePositionMode(HANDLE p_DeviceHandle, unsigned short p_usNodeId, unsigned int* p_pErrorCode);
   int 	ActivateHomingMode(HANDLE p_DeviceHandle, unsigned short p_usNodeId, unsigned int* p_pErrorCode);
   int 	FindHome(unsigned int* p_pErrorCode);
   int 	HomingSuccess(bool* homing_success, unsigned int* p_pErrorCode);

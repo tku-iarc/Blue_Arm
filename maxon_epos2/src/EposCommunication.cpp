@@ -400,6 +400,25 @@ int EposCommunication::ActivateProfilePositionMode(HANDLE p_DeviceHandle, unsign
 	return lResult;
 }
 
+int EposCommunication::ActivatePositionMode(HANDLE p_DeviceHandle, unsigned short p_usNodeId, unsigned int* p_pErrorCode)
+{
+	int lResult = MMC_SUCCESS;
+	std::stringstream msg;
+
+	msg << "set profile position mode, node = " << p_usNodeId;
+	LogInfo(msg.str());
+
+	if(VCS_ActivatePositionMode(p_DeviceHandle, p_usNodeId, p_pErrorCode) == MMC_FAILED)
+	{
+		LogError("VCS_ActivatePositionMode", lResult, *p_pErrorCode);
+		lResult = MMC_FAILED;
+	}
+	else {
+		ROS_INFO("VCS_ActivatePositionMode successfull.");
+	}
+	return lResult;
+}
+
 int EposCommunication::ActivateHomingMode(HANDLE p_DeviceHandle, unsigned short p_usNodeId, unsigned int* p_pErrorCode)
 {
 	int lResult = MMC_SUCCESS;
@@ -787,13 +806,13 @@ int EposCommunication::startPositionMode()
 	// 	ROS_INFO("PositionMode successfully started.");
 	// }
 
-	if((lResult = ActivateProfilePositionMode(g_pKeyHandle, g_usNodeId, &ulErrorCode))==MMC_FAILED)
+	if((lResult = ActivatePositionMode(g_pKeyHandle, g_usNodeId, &ulErrorCode))==MMC_FAILED)
 	{
 		LogError("PositionMode", lResult, ulErrorCode);
 	}
 	for(int i = 1; i < g_motors; i++)
 	{
-		if((lResult = ActivateProfilePositionMode(g_pSubKeyHandle, g_nodeIdList[i], &ulErrorCode))==MMC_FAILED)
+		if((lResult = ActivatePositionMode(g_pSubKeyHandle, g_nodeIdList[i], &ulErrorCode))==MMC_FAILED)
 		{
 			LogError("PositionSubMode", lResult, ulErrorCode, g_nodeIdList[i]);
 		}
@@ -870,6 +889,24 @@ int EposCommunication::setPosition(unsigned short p_usNodeId, double position_se
 			// ROS_INFO("Movement executed.");
 		}
 	}
+	return lResult;
+}
+
+int EposCommunication::setPositionMust(unsigned short p_usNodeId, double position_setpoint)
+{
+	int lResult = MMC_SUCCESS;
+	unsigned int ulErrorCode = 0;
+	HANDLE p_DeviceHandle = (p_usNodeId == g_usNodeId) ? g_pKeyHandle : g_pSubKeyHandle;
+
+	if(VCS_SetPositionMust(p_DeviceHandle, p_usNodeId, position_setpoint, &ulErrorCode) == MMC_FAILED)
+	{
+		LogError("VCS_SetPositionMust", lResult, ulErrorCode, p_usNodeId);
+		lResult = MMC_FAILED;
+	}
+	else{
+		// ROS_INFO("Movement executed.");
+	}
+
 	return lResult;
 }
 

@@ -87,12 +87,12 @@ bool EposController::read(int id, double& pos, double& vel, double& eff, double 
 bool EposController::write(int id, double& cmd, double& vel, double offset)
 {
 
-	if(epos_device_.setPositionProfile(id, vel, 4 * vel, 4 * vel)==MMC_FAILED)
-	{
-		ROS_ERROR_STREAM("Seting position profile failed, vel = "<<vel);
-		return false;
-	}
-	if(epos_device_.setPosition(id, cmd - offset)==MMC_FAILED)
+	// if(epos_device_.setPositionProfile(id, vel, 4 * vel, 4 * vel)==MMC_FAILED)
+	// {
+	// 	ROS_ERROR_STREAM("Seting position profile failed, vel = "<<vel);
+	// 	return false;
+	// }
+	if(epos_device_.setPositionMust(id, cmd - offset)==MMC_FAILED)
 	{
 		ROS_ERROR("Seting position failed");
 		return false;

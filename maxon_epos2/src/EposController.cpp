@@ -18,8 +18,9 @@ EposController::EposController()
 	//Initialize device:
 	if((epos_device_.initialization(id_list, motors))==MMC_FAILED) ROS_ERROR("Device initialization");
 	//Start position mode during homing callback function:
-	if((epos_device_.startPositionMode())==MMC_FAILED) ROS_ERROR("Starting position mode failed");
-	//   if((epos_device_.setPositionProfile())==MMC_FAILED) ROS_ERROR("Seting position profile failed");
+	if((epos_device_.startVolicityMode())==MMC_FAILED) ROS_ERROR("Starting velocity mode failed");
+	// if((epos_device_.startPositionMode())==MMC_FAILED) ROS_ERROR("Starting position mode failed");
+	// if((epos_device_.setPositionProfile())==MMC_FAILED) ROS_ERROR("Seting position profile failed");
 }
 
 // EposController::EposController(ros::NodeHandle& nodeHandle)
@@ -70,49 +71,55 @@ bool EposController::read(int id, double& pos, double& vel, double& eff, double 
 	pos = contorller_pos + offset;
 	eff = 0;
 	return true;
-	// if((epos_device_.deviceOpenedCheck()) == MMC_SUCCESS)
-	// {
-	// 	for(int i = 0; i < motors; i++)
-	// 	{
-	// 		epos_device_.getPosition(id_list[i], &poss[i]);
-	// 		epos_device_.getVelocity(id_list[i], &vels[i]);
-	// 		effs[i] = 0;
-	// 	}
-	// }
-	// else
-	// 	return false;
-	// return true;
 }
 
-bool EposController::write(int id, double& cmd, double& vel, double offset)
+bool EposController::readPosition(int id, double& pos, double offset)
 {
+	double contorller_pos = 0;
+	if(epos_device_.getPosition(id, &contorller_pos) == MMC_FAILED)
+	{
+		ROS_ERROR("Get position failed");
+		return false;
+	}
+	pos = contorller_pos + offset;
+	return true;
+}
 
-	// if(epos_device_.setPositionProfile(id, vel, 4 * vel, 4 * vel)==MMC_FAILED)
-	// {
-	// 	ROS_ERROR_STREAM("Seting position profile failed, vel = "<<vel);
-	// 	return false;
-	// }
+bool EposController::writeVelocity(int id, double& cmd)
+{
+	if(epos_device_.setVelocityMust(id, cmd)==MMC_FAILED)
+	{
+		ROS_ERROR("Seting position failed");
+		return false;
+	}
+	return true;
+}
+
+bool EposController::writePosition(int id, double& cmd, double offset)
+{
 	if(epos_device_.setPositionMust(id, cmd - offset)==MMC_FAILED)
 	{
 		ROS_ERROR("Seting position failed");
 		return false;
 	}
 	return true;
-	// for(int i = 0; i < motors; i++)
-	// {
-	// 	if(epos_device_.setPositionProfile(id_list[i], vel, 2 * vel, 2 * vel)==MMC_FAILED)
-	// 	{
-	// 		ROS_ERROR("Seting position profile failed");
-	// 		return false;
-	// 	}
-	// 	if(epos_device_.setPosition(id_list[i], cmds[i])==MMC_FAILED)
-	// 	{
-	// 		ROS_ERROR("setPosition failed");
-	// 		return false;
-	// 	}
-	// }
-	// return true;
 }
+
+bool EposController::writeProfilePosition(int id, double& cmd, double& vel, double offset)
+{
+
+	if(epos_device_.setPositionProfile(id, vel, 4 * vel, 4 * vel)==MMC_FAILED)
+	{
+		ROS_ERROR_STREAM("Seting position profile failed, vel = "<<vel);
+		return false;
+	}
+	if(epos_device_.setPosition(id, cmd - offset)==MMC_FAILED)
+	{
+		ROS_ERROR("Seting position failed");
+		return false;
+	}
+}
+
 // bool EposController::readParameters()
 // {
 // 	if (!nodeHandle_.getParam("publisher_topic", publisherTopic_)) return false;

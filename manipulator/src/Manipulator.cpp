@@ -3,7 +3,7 @@
 Manipulator::Manipulator(ros::NodeHandle& nodeHandle)
     :nodeHandle_(nodeHandle)
 {
-    sample_rate = 25;
+    sample_rate = 12;
     arm_state = Disable;
     joint_data_init();
     blue_arm_interface = new hardware_interface::BlueArmInterface(this->joint_data, sample_rate);
@@ -229,13 +229,13 @@ void Manipulator::closeDevice()
 }
 void Manipulator::process(ros::Rate& loop_rate)
 {
-    // ros::Time t1 = ros::Time::now();
-    blue_arm_interface->read();
-    // ros::Time t2 = ros::Time::now();
+    ros::Time t1 = ros::Time::now();
+    blue_arm_interface->readPosition();
+    ros::Time t2 = ros::Time::now();
     blue_arm_cm->update(ros::Time::now(), loop_rate.expectedCycleTime());
-    // ros::Time t3 = ros::Time::now();
-    blue_arm_interface->write();
-    // ros::Time t4 = ros::Time::now();
-    // std::cout<<"go once"<<(t2-t1).toSec()<<", "<<(t3-t2).toSec()<<", "<<(t4-t3).toSec()<<std::endl;
+    ros::Time t3 = ros::Time::now();
+    blue_arm_interface->writeVelocity();
+    ros::Time t4 = ros::Time::now();
+    std::cout<<"go once"<<(t2-t1).toSec()<<", "<<(t3-t2).toSec()<<", "<<(t4-t3).toSec()<<std::endl;
     return;
 }

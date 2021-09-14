@@ -419,6 +419,25 @@ int EposCommunication::ActivatePositionMode(HANDLE p_DeviceHandle, unsigned shor
 	return lResult;
 }
 
+int EposCommunication::ActivateVelocityMode(HANDLE p_DeviceHandle, unsigned short p_usNodeId, unsigned int* p_pErrorCode)
+{
+	int lResult = MMC_SUCCESS;
+	std::stringstream msg;
+
+	msg << "set velocity mode, node = " << p_usNodeId;
+	LogInfo(msg.str());
+
+	if(VCS_ActivateVelocityMode(p_DeviceHandle, p_usNodeId, p_pErrorCode) == MMC_FAILED)
+	{
+		LogError("VCS_ActivateVelocityMode", lResult, *p_pErrorCode);
+		lResult = MMC_FAILED;
+	}
+	else {
+		ROS_INFO("VCS_ActivateVelocityMode successfull.");
+	}
+	return lResult;
+}
+
 int EposCommunication::ActivateHomingMode(HANDLE p_DeviceHandle, unsigned short p_usNodeId, unsigned int* p_pErrorCode)
 {
 	int lResult = MMC_SUCCESS;
@@ -479,11 +498,7 @@ int EposCommunication::HomingSuccess(bool* homing_success, unsigned int* p_pErro
 
 int EposCommunication::SetPosition(HANDLE p_DeviceHandle, unsigned short p_usNodeId, long position_setpoint, unsigned int* p_pErrorCode)
 {
-	// absolute position, starts immediately
 	int lResult = MMC_SUCCESS;
-	// std::stringstream msg;
-	// msg << "move to position = " << position_setpoint << ", node = " << g_usNodeId;
-	// LogInfo(msg.str());
 	bool absolute = true;
 
 	if(VCS_MoveToPosition(p_DeviceHandle, p_usNodeId, position_setpoint, absolute, 1, p_pErrorCode) == MMC_FAILED)
@@ -742,6 +757,10 @@ int EposCommunication::initialization(unsigned short *nodeIdList, int motors){
 	{
 		LogError("VCS_GetMaxProfileVelocity", lResult, ulErrorCode);
 	}
+	if((lResult = VCS_SetMaxProfileVelocity(g_pKeyHandle, g_usNodeId, pMaxProfileVelocity, &ulErrorCode))==MMC_FAILED)
+	{
+		LogError("VCS_SetMaxProfileVelocity", lResult, ulErrorCode);
+	}
 	if((lResult = VCS_SetMaxAcceleration(g_pKeyHandle, g_usNodeId, MaxAcceleration, &ulErrorCode))==MMC_FAILED)
 	{
 		LogError("VCS_SetMaxAcceleration", lResult, ulErrorCode);
@@ -750,7 +769,6 @@ int EposCommunication::initialization(unsigned short *nodeIdList, int motors){
 	{
 		LogError("VCS_GetMaxAcceleration", lResult, ulErrorCode);
 	}
-	std::cout<<"ID: "<<g_usNodeId<<", pMaxFollowingError: "<<pMaxFollowingError<<", pMaxProfileVelocity: "<<pMaxProfileVelocity<<", pMaxAcceleration: "<<pMaxAcceleration<<std::endl;
 	for(int i = 1; i < g_motors; i++)
 	{
 		if((lResult = VCS_GetMaxFollowingError(g_pSubKeyHandle, g_nodeIdList[i], &pMaxFollowingError, &ulErrorCode))==MMC_FAILED)
@@ -771,13 +789,6 @@ int EposCommunication::initialization(unsigned short *nodeIdList, int motors){
 		}
 		std::cout<<"ID: "<<g_nodeIdList[i]<<", pMaxFollowingError: "<<pMaxFollowingError<<", pMaxProfileVelocity: "<<pMaxProfileVelocity<<", pMaxAcceleration: "<<pMaxAcceleration<<std::endl;
 	}
-
-	// VCS_SetMaxFollowingError(void* KeyHandle, unsigned short NodeId, unsigned int MaxFollowingError, unsigned int* pErrorCode);
-    // VCS_GetMaxFollowingError(void* KeyHandle, unsigned short NodeId, unsigned int* pMaxFollowingError, unsigned int* pErrorCode);
-    // VCS_SetMaxProfileVelocity(void* KeyHandle, unsigned short NodeId, unsigned int MaxProfileVelocity, unsigned int* pErrorCode);
-    // VCS_GetMaxProfileVelocity(void* KeyHandle, unsigned short NodeId, unsigned int* pMaxProfileVelocity, unsigned int* pErrorCode);
-    // VCS_SetMaxAcceleration(void* KeyHandle, unsigned short NodeId, unsigned int MaxAcceleration, unsigned int* pErrorCode);
-    // VCS_GetMaxAcceleration(void* KeyHandle, unsigned short NodeId, unsigned int* pMaxAcceleration, unsigned int* pErrorCode);
 	
 	// for(int i = 1; i <= g_motors; i++)
 	// {
@@ -870,6 +881,25 @@ int EposCommunication::startPositionMode()
 	return lResult;
 }
 
+int EposCommunication::startVolicityMode()
+{
+	int lResult = MMC_FAILED;
+	unsigned int ulErrorCode = 0;
+
+	if((lResult = ActivateVelocityMode(g_pKeyHandle, g_usNodeId, &ulErrorCode))==MMC_FAILED)
+	{
+		LogError("ActivateVelocityMode", lResult, ulErrorCode);
+	}
+	for(int i = 1; i < g_motors; i++)
+	{
+		if((lResult = ActivateVelocityMode(g_pSubKeyHandle, g_nodeIdList[i], &ulErrorCode))==MMC_FAILED)
+		{
+			LogError("ActivateVelocityMode Sub", lResult, ulErrorCode, g_nodeIdList[i]);
+		}
+	}
+	return lResult;
+}
+
 int EposCommunication::setPositionProfile(unsigned short p_usNodeId, double profile_velocity,
 										  double profile_acceleration = 1000,
 										  double profile_deceleration = 1000)
@@ -917,17 +947,6 @@ int EposCommunication::setPosition(unsigned short p_usNodeId, double position_se
 	//Safety check setpoint and homing:
 	if(position_setpoint <= M_PI && position_setpoint >= -1 * M_PI)
 	{
-		// if((lResult = SetPosition(p_DeviceHandle, p_usNodeId, mmToCounts(position_setpoint), &ulErrorCode))==MMC_FAILED)
-		// {
-		// 	LogError("SetPosition", lResult, ulErrorCode, p_usNodeId);
-		// 	return lResult;
-		// }
-		// else{
-		// 	ROS_INFO("SetPosition executed.");
-		// }
-		// std::stringstream msg;
-		// msg << "move to position = " << position_setpoint << ", node = " << g_usNodeId;
-		// LogInfo(msg.str());
 		bool absolute = true;
 
 		if(VCS_MoveToPosition(p_DeviceHandle, p_usNodeId, mmToCounts(position_setpoint), absolute, 1, &ulErrorCode) == MMC_FAILED)
@@ -952,6 +971,25 @@ int EposCommunication::setPositionMust(unsigned short p_usNodeId, double positio
 	{
 		LogError("VCS_SetPositionMust", lResult, ulErrorCode, p_usNodeId);
 		std::cout<<"position_setpoint: "<<position_setpoint<<", to counts: "<<mmToCounts(position_setpoint)<<std::endl;
+		lResult = MMC_FAILED;
+	}
+	else{
+		// ROS_INFO("Movement executed.");
+	}
+
+	return lResult;
+}
+
+int EposCommunication::setVelocityMust(unsigned short p_usNodeId, double velocity_setpoint)
+{
+	int lResult = MMC_SUCCESS;
+	unsigned int ulErrorCode = 0;
+	HANDLE p_DeviceHandle = (p_usNodeId == g_usNodeId) ? g_pKeyHandle : g_pSubKeyHandle;
+
+	if(VCS_SetVelocityMust(p_DeviceHandle, p_usNodeId, radsToRpm(velocity_setpoint), &ulErrorCode) == MMC_FAILED)
+	{
+		LogError("VCS_SetVelocityMust", lResult, ulErrorCode, p_usNodeId);
+		std::cout<<"velocity_setpoint: "<<velocity_setpoint<<", to counts: "<<radsToRpm(velocity_setpoint)<<std::endl;
 		lResult = MMC_FAILED;
 	}
 	else{

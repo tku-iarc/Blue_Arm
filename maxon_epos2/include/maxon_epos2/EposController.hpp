@@ -44,7 +44,10 @@ class EposController
   virtual ~EposController();
   bool deviceOpenedCheck();
   bool read(int id, double& pos, double& vel, double& eff, double offset=0);
-  bool write(int id, double& cmd, double& vel, double offset=0);
+  bool readPosition(int id, double& pos, double offset);
+  bool writeProfilePosition(int id, double& cmd, double& vel, double offset=0);
+  bool writePosition(int id, double& cmd, double offset);
+  bool writeVelocity(int id, double& cmd);
   void publisherLoop();
   void closeDevice();
 

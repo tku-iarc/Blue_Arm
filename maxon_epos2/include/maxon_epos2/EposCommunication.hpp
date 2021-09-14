@@ -69,6 +69,7 @@ class EposCommunication
   bool 	deviceOpenedCheck();
   int 	homing();
   int 	startPositionMode();
+  int   startVolicityMode();
   int   setHomingParameter(unsigned short p_usNodeId, unsigned int* p_pErrorCode);
   int   setPositionProfile(unsigned short p_usNodeId,
                            double profile_velocity,
@@ -76,6 +77,7 @@ class EposCommunication
 										       double profile_deceleration);
   int 	setPosition(unsigned short p_usNodeI, double position_setpoint);
   int   setPositionMust(unsigned short p_usNodeId, double position_setpoint);
+  int   setVelocityMust(unsigned short p_usNodeId, double velocity_setpoint);
   int 	getPosition(unsigned short p_usNodeI, double* pPositionIs);
   int 	getVelocity(unsigned short p_usNodeI, double* pVelocityIs);
   int 	closeDevice();
@@ -124,6 +126,7 @@ class EposCommunication
   int 	HomingMode(unsigned int* p_pErrorCode);
   int	  ActivateProfilePositionMode(HANDLE p_DeviceHandle, unsigned short p_usNodeId, unsigned int* p_pErrorCode);
   int   ActivatePositionMode(HANDLE p_DeviceHandle, unsigned short p_usNodeId, unsigned int* p_pErrorCode);
+  int   ActivateVelocityMode(HANDLE p_DeviceHandle, unsigned short p_usNodeId, unsigned int* p_pErrorCode);
   int 	ActivateHomingMode(HANDLE p_DeviceHandle, unsigned short p_usNodeId, unsigned int* p_pErrorCode);
   int 	FindHome(unsigned int* p_pErrorCode);
   int 	HomingSuccess(bool* homing_success, unsigned int* p_pErrorCode);

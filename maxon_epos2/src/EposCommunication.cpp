@@ -1074,14 +1074,14 @@ int EposCommunication::mmToCounts(double mm){
 int EposCommunication::radsToRpm(double rads)
 {
 	int rpm;
-	rpm = rads * 100 * 60 / (2 * M_PI);
+	rpm = -1 * rads * 100 * 60 / (2 * M_PI);
 	return rpm;
 }
 
 double EposCommunication::rpmToRads(int* rpm)
 {
 	double rads;
-	rads = (*rpm) / 100. / 60. * (2 * M_PI);
+	rads = -1 * (*rpm) / 100. / 60. * (2 * M_PI);
 	return rads;
 }
 

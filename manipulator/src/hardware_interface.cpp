@@ -4,8 +4,10 @@
 namespace hardware_interface
 {
 
-BlueArmInterface::BlueArmInterface(std::vector<JointData*>& joint_data, float sample_rate) 
+BlueArmInterface::BlueArmInterface(ros::NodeHandle& nodeHandle, std::vector<JointData*>& joint_data, float sample_rate, std::string control_mode)
+    :nodeHandle_(nodeHandle)
 { 
+    this->control_mode = (control_mode.compare("position") == 0) ? 0 : 1;
     this->sample_rate = sample_rate;
     jd_ptr = joint_data;
     time_now = ros::Time::now();
@@ -16,64 +18,50 @@ BlueArmInterface::BlueArmInterface(std::vector<JointData*>& joint_data, float sa
         jnt_state_interface.registerHandle(state_handle);
         
     }
-    // // connect and register the joint state interface
-    // hardware_interface::JointStateHandle state_handle_1("joint_1", &poss[0], &vels[0], &effs[0]);
-    // jnt_state_interface.registerHandle(state_handle_1);
-
-    // hardware_interface::JointStateHandle state_handle_2("joint_2", &poss[1], &vels[1], &effs[1]);
-    // jnt_state_interface.registerHandle(state_handle_2);
-
-    // hardware_interface::JointStateHandle state_handle_3("joint_3", &poss[2], &vels[2], &effs[2]);
-    // jnt_state_interface.registerHandle(state_handle_3);
-
-    // hardware_interface::JointStateHandle state_handle_4("joint_4", &poss[3], &vels[3], &effs[3]);
-    // jnt_state_interface.registerHandle(state_handle_4);
-
-    // hardware_interface::JointStateHandle state_handle_5("joint_5", &poss[4], &vels[4], &effs[4]);
-    // jnt_state_interface.registerHandle(state_handle_5);
-
-    // hardware_interface::JointStateHandle state_handle_6("joint_6", &poss[5], &vels[5], &effs[5]);
-    // jnt_state_interface.registerHandle(state_handle_6);
-
-    // hardware_interface::JointStateHandle state_handle_7("joint_7", &poss[6], &vels[6], &effs[6]);
-    // jnt_state_interface.registerHandle(state_handle_7);
-
     registerInterface(&jnt_state_interface);
-
-    for (int i=0; i < jd_ptr.size(); i++)
+    
+    if(this->control_mode == 0)
     {
-        hardware_interface::JointHandle pos_handle(jnt_state_interface.getHandle(jd_ptr[i]->joint_name_), &jd_ptr[i]->angle_cmd_);
-        jnt_pos_interface.registerHandle(pos_handle);
+        initJointInterface(jnt_pos_interface);
     }
-    // // connect and register the joint position interface
-    // hardware_interface::JointHandle pos_handle_1(jnt_state_interface.getHandle("joint_1"), &cmds[0]);
-    // jnt_pos_interface.registerHandle(pos_handle_1);
-
-    // hardware_interface::JointHandle pos_handle_2(jnt_state_interface.getHandle("joint_2"), &cmds[1]);
-    // jnt_pos_interface.registerHandle(pos_handle_2);
-
-    // hardware_interface::JointHandle pos_handle_3(jnt_state_interface.getHandle("joint_3"), &cmds[2]);
-    // jnt_pos_interface.registerHandle(pos_handle_3);
-
-    // hardware_interface::JointHandle pos_handle_4(jnt_state_interface.getHandle("joint_4"), &cmds[3]);
-    // jnt_pos_interface.registerHandle(pos_handle_4);
-
-    // hardware_interface::JointHandle pos_handle_5(jnt_state_interface.getHandle("joint_5"), &cmds[4]);
-    // jnt_pos_interface.registerHandle(pos_handle_5);
-
-    // hardware_interface::JointHandle pos_handle_6(jnt_state_interface.getHandle("joint_6"), &cmds[5]);
-    // jnt_pos_interface.registerHandle(pos_handle_6);
-
-    // hardware_interface::JointHandle pos_handle_7(jnt_state_interface.getHandle("joint_7"), &cmds[6]);
-    // jnt_pos_interface.registerHandle(pos_handle_7);
-
-    registerInterface(&jnt_pos_interface);
+    else
+    {
+        initJointInterface(jnt_vel_interface);
+    }
 }
 
 BlueArmInterface::~BlueArmInterface()
 {
     //if node is interrupted, close device
     epos_controller.closeDevice();
+}
+
+template <typename JointInterface>
+void BlueArmInterface::initJointInterface(JointInterface& jnt_interface)
+{
+    for (int i=0; i < jd_ptr.size(); i++)
+    {
+        double* cmd = new double;
+        if(control_mode == 0)
+            cmd = &jd_ptr[i]->angle_cmd_;
+        else
+            cmd = &jd_ptr[i]->velocity_cmd_;
+        hardware_interface::JointHandle joint_handle(jnt_state_interface.getHandle(jd_ptr[i]->joint_name_), cmd);
+        jnt_interface.registerHandle(joint_handle);
+        joint_limits_interface::JointLimits limits;
+        const bool rosparam_limits_ok = getJointLimits(jd_ptr[i]->joint_name_, nodeHandle_, limits);
+        if(control_mode == 0)
+        {
+            joint_limits_interface::PositionJointSaturationHandle limit_handle(joint_handle, limits);
+            jnt_pos_limits_interface.registerHandle(limit_handle);
+        }
+        else
+        {
+            joint_limits_interface::VelocityJointSaturationHandle limit_handle(joint_handle, limits);
+            jnt_vel_limits_interface.registerHandle(limit_handle);
+        }
+    }
+    registerInterface(&jnt_interface);
 }
 
 void BlueArmInterface::closeDevice()
@@ -144,11 +132,12 @@ bool BlueArmInterface::readAll()
     return true;
 }
 
-bool BlueArmInterface::writePosition()
+bool BlueArmInterface::writePosition(ros::Duration period)
 {
     // std::cout<<"joint data in write: "<<jd_ptr[3]->joint_angle_<<", "<<jd_ptr[3]->angle_cmd_<<std::endl;
     if(epos_controller.deviceOpenedCheck() == false)
         return false;
+    jnt_pos_limits_interface.enforceLimits(period);
     for (int i=0; i < jd_ptr.size(); i++)
     {
         float move_dis = fabs(jd_ptr[i]->angle_cmd_ - jd_ptr[i]->joint_angle_);
@@ -163,11 +152,12 @@ bool BlueArmInterface::writePosition()
     return true;
 }
 
-bool BlueArmInterface::writeVelocity()
+bool BlueArmInterface::writeVelocity(ros::Duration period)
 {
     // std::cout<<"joint data in write: "<<jd_ptr[3]->joint_angle_<<", "<<jd_ptr[3]->angle_cmd_<<std::endl;
     if(epos_controller.deviceOpenedCheck() == false)
         return false;
+    jnt_vel_limits_interface.enforceLimits(period);
     for (int i=0; i < jd_ptr.size(); i++)
     {
         checkCmdLimit(i);

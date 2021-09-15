@@ -3,13 +3,12 @@
 Manipulator::Manipulator(ros::NodeHandle& nodeHandle)
     :nodeHandle_(nodeHandle)
 {
-    sample_rate = 12;
+    sample_rate = nodeHandle.param<int>("/blue_arm_control/sample_rate", 12);
+    control_mode = nodeHandle.param<std::string>("/blue_arm_control/control_mode", "velocity");
     arm_state = Disable;
     joint_data_init();
-    blue_arm_interface = new hardware_interface::BlueArmInterface(this->joint_data, sample_rate);
+    blue_arm_interface = new hardware_interface::BlueArmInterface(nodeHandle_, this->joint_data, sample_rate, control_mode);
     blue_arm_cm = new controller_manager::ControllerManager(blue_arm_interface, nodeHandle);
-    // bool load_controller = blue_arm_cm->loadController("blue_arm_controller");
-    // std::cout<<"!!!!!!!!!!!!!!!!!!!!!!! "<<load_controller<<"!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!"<<std::endl;
 }
 
 // Manipulator::Manipulator(ros::NodeHandle& nodeHandle)
@@ -234,7 +233,7 @@ void Manipulator::process(ros::Rate& loop_rate)
     ros::Time t2 = ros::Time::now();
     blue_arm_cm->update(ros::Time::now(), loop_rate.expectedCycleTime());
     ros::Time t3 = ros::Time::now();
-    blue_arm_interface->writeVelocity();
+    blue_arm_interface->writeVelocity(loop_rate.expectedCycleTime());
     ros::Time t4 = ros::Time::now();
     std::cout<<"go once"<<(t2-t1).toSec()<<", "<<(t3-t2).toSec()<<", "<<(t4-t3).toSec()<<std::endl;
     return;

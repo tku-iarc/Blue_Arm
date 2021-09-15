@@ -63,4 +63,5 @@ public:
     void process(ros::Rate& loop_rate);
     std::vector<JointData*> joint_data;
     float sample_rate;
+    std::string control_mode;
 };

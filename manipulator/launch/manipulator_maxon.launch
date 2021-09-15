@@ -1,5 +1,6 @@
 <launch>
-  <arg name="hw_interface" default="true"/>
+  <arg name="control_mode" default="velocity"/>
+  <arg name="sample_rate" default="12"/>
   <!-- Start a node for each axis, copy this -->
   <!-- <node name="maxon" pkg="maxon_epos2" type="maxon_epos2" output="screen" unless="$(arg hw_interface)">
   	<rosparam command="load" file="$(find maxon_epos2)/config/default.yaml" />
@@ -8,7 +9,8 @@
   
   <!-- <rosparam file="$(find manipulator)/config/ros_controllers.yaml" command="load"/> -->
   <node name="blue_arm_control" pkg="manipulator" type="manipulator_node" output="screen">
-    <param name="hw_interface" type="bool" value="$(arg hw_interface)"/>
+    <param name="control_mode" value="$(arg control_mode)"/>
+    <param name="sample_rate"  value="$(arg sample_rate)"/>
   </node>
   <include file="$(find manipulator)/launch/ros_controllers.launch"/>
 

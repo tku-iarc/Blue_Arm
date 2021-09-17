@@ -44,8 +44,10 @@ class EposController
   virtual ~EposController();
   bool deviceOpenedCheck();
   bool read(int id, double& pos, double& vel, double& eff, double offset=0);
-  bool write(int id, double& cmd, double& vel, double offset=0);
-  void publisherLoop();
+  bool readPosition(int id, double& pos, double offset);
+  bool writeProfilePosition(int id, double& cmd, double& vel, double offset=0);
+  bool writePosition(int id, double& cmd, double offset);
+  bool writeVelocity(int id, double& cmd);
   void closeDevice();
 
  private:
@@ -54,25 +56,6 @@ class EposController
    * @return true if successful.
    */
   // bool readParameters();
-  bool homingCallback(std_srvs::Trigger::Request& request, std_srvs::Trigger::Response& response);
-  bool serviceCallback(maxon_epos2::epos_motor_service::Request& request, maxon_epos2::epos_motor_service::Response& response);
-
-  //! ROS node handle.
-  // ros::NodeHandle& nodeHandle_;
-
-  //! ROS topic publisher.
-  ros::Publisher publisher_;
-
-  //! ROS service server
-  ros::ServiceServer service_;
-  ros::ServiceServer homing_service_;
-
-  //! ROS publisher topic name
-  std::string publisherTopic_;
-
-  //! ROS service server name
-  std::string serviceName_;
-
   //! Device object
   EposCommunication epos_device_;
 

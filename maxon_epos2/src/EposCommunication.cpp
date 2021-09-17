@@ -17,7 +17,6 @@ EposCommunication::EposCommunication()
 	g_pKeyHandle = 0; //set adress to zero
 	g_pSubKeyHandle = 0;
 	g_usNodeId = 1;
-	// g_usSubNodeId = 2;
 	g_baudrate = 0;
 }
 
@@ -400,6 +399,44 @@ int EposCommunication::ActivateProfilePositionMode(HANDLE p_DeviceHandle, unsign
 	return lResult;
 }
 
+int EposCommunication::ActivatePositionMode(HANDLE p_DeviceHandle, unsigned short p_usNodeId, unsigned int* p_pErrorCode)
+{
+	int lResult = MMC_SUCCESS;
+	std::stringstream msg;
+
+	msg << "set position mode, node = " << p_usNodeId;
+	LogInfo(msg.str());
+
+	if(VCS_ActivatePositionMode(p_DeviceHandle, p_usNodeId, p_pErrorCode) == MMC_FAILED)
+	{
+		LogError("VCS_ActivatePositionMode", lResult, *p_pErrorCode);
+		lResult = MMC_FAILED;
+	}
+	else {
+		ROS_INFO("VCS_ActivatePositionMode successfull.");
+	}
+	return lResult;
+}
+
+int EposCommunication::ActivateVelocityMode(HANDLE p_DeviceHandle, unsigned short p_usNodeId, unsigned int* p_pErrorCode)
+{
+	int lResult = MMC_SUCCESS;
+	std::stringstream msg;
+
+	msg << "set velocity mode, node = " << p_usNodeId;
+	LogInfo(msg.str());
+
+	if(VCS_ActivateVelocityMode(p_DeviceHandle, p_usNodeId, p_pErrorCode) == MMC_FAILED)
+	{
+		LogError("VCS_ActivateVelocityMode", lResult, *p_pErrorCode);
+		lResult = MMC_FAILED;
+	}
+	else {
+		ROS_INFO("VCS_ActivateVelocityMode successfull.");
+	}
+	return lResult;
+}
+
 int EposCommunication::ActivateHomingMode(HANDLE p_DeviceHandle, unsigned short p_usNodeId, unsigned int* p_pErrorCode)
 {
 	int lResult = MMC_SUCCESS;
@@ -460,11 +497,7 @@ int EposCommunication::HomingSuccess(bool* homing_success, unsigned int* p_pErro
 
 int EposCommunication::SetPosition(HANDLE p_DeviceHandle, unsigned short p_usNodeId, long position_setpoint, unsigned int* p_pErrorCode)
 {
-	// absolute position, starts immediately
 	int lResult = MMC_SUCCESS;
-	// std::stringstream msg;
-	// msg << "move to position = " << position_setpoint << ", node = " << g_usNodeId;
-	// LogInfo(msg.str());
 	bool absolute = true;
 
 	if(VCS_MoveToPosition(p_DeviceHandle, p_usNodeId, position_setpoint, absolute, 1, p_pErrorCode) == MMC_FAILED)
@@ -710,6 +743,52 @@ int EposCommunication::initialization(unsigned short *nodeIdList, int motors){
 			// }
 		}
 	}
+
+	unsigned int pMaxFollowingError;
+	unsigned int pMaxProfileVelocity;
+	unsigned int pMaxAcceleration;
+	unsigned int MaxAcceleration = 5000;
+	if((lResult = VCS_GetMaxFollowingError(g_pKeyHandle, g_usNodeId, &pMaxFollowingError, &ulErrorCode))==MMC_FAILED)
+	{
+		LogError("VCS_GetMaxFollowingError", lResult, ulErrorCode);
+	}
+	if((lResult = VCS_GetMaxProfileVelocity(g_pKeyHandle, g_usNodeId, &pMaxProfileVelocity, &ulErrorCode))==MMC_FAILED)
+	{
+		LogError("VCS_GetMaxProfileVelocity", lResult, ulErrorCode);
+	}
+	if((lResult = VCS_SetMaxProfileVelocity(g_pKeyHandle, g_usNodeId, pMaxProfileVelocity, &ulErrorCode))==MMC_FAILED)
+	{
+		LogError("VCS_SetMaxProfileVelocity", lResult, ulErrorCode);
+	}
+	if((lResult = VCS_SetMaxAcceleration(g_pKeyHandle, g_usNodeId, MaxAcceleration, &ulErrorCode))==MMC_FAILED)
+	{
+		LogError("VCS_SetMaxAcceleration", lResult, ulErrorCode);
+	}
+	if((lResult = VCS_GetMaxAcceleration(g_pKeyHandle, g_usNodeId, &pMaxAcceleration, &ulErrorCode))==MMC_FAILED)
+	{
+		LogError("VCS_GetMaxAcceleration", lResult, ulErrorCode);
+	}
+	for(int i = 1; i < g_motors; i++)
+	{
+		if((lResult = VCS_GetMaxFollowingError(g_pSubKeyHandle, g_nodeIdList[i], &pMaxFollowingError, &ulErrorCode))==MMC_FAILED)
+		{
+			LogError("VCS_GetMaxFollowingError", lResult, ulErrorCode, g_nodeIdList[i]);
+		}
+		if((lResult = VCS_GetMaxProfileVelocity(g_pSubKeyHandle, g_nodeIdList[i], &pMaxProfileVelocity, &ulErrorCode))==MMC_FAILED)
+		{
+			LogError("VCS_GetMaxProfileVelocity", lResult, ulErrorCode, g_nodeIdList[i]);
+		}
+		if((lResult = VCS_SetMaxAcceleration(g_pSubKeyHandle, g_nodeIdList[i], MaxAcceleration, &ulErrorCode))==MMC_FAILED)
+		{
+			LogError("VCS_SetMaxAcceleration", lResult, ulErrorCode, g_nodeIdList[i]);
+		}
+		if((lResult = VCS_GetMaxAcceleration(g_pSubKeyHandle, g_nodeIdList[i], &pMaxAcceleration, &ulErrorCode))==MMC_FAILED)
+		{
+			LogError("VCS_GetMaxAcceleration", lResult, ulErrorCode, g_nodeIdList[i]);
+		}
+		std::cout<<"ID: "<<g_nodeIdList[i]<<", pMaxFollowingError: "<<pMaxFollowingError<<", pMaxProfileVelocity: "<<pMaxProfileVelocity<<", pMaxAcceleration: "<<pMaxAcceleration<<std::endl;
+	}
+	
 	// for(int i = 1; i <= g_motors; i++)
 	// {
 	// 	if((lResult = setHomingParameter(i, &ulErrorCode))==MMC_FAILED)
@@ -787,15 +866,34 @@ int EposCommunication::startPositionMode()
 	// 	ROS_INFO("PositionMode successfully started.");
 	// }
 
-	if((lResult = ActivateProfilePositionMode(g_pKeyHandle, g_usNodeId, &ulErrorCode))==MMC_FAILED)
+	if((lResult = ActivatePositionMode(g_pKeyHandle, g_usNodeId, &ulErrorCode))==MMC_FAILED)
 	{
 		LogError("PositionMode", lResult, ulErrorCode);
 	}
 	for(int i = 1; i < g_motors; i++)
 	{
-		if((lResult = ActivateProfilePositionMode(g_pSubKeyHandle, g_nodeIdList[i], &ulErrorCode))==MMC_FAILED)
+		if((lResult = ActivatePositionMode(g_pSubKeyHandle, g_nodeIdList[i], &ulErrorCode))==MMC_FAILED)
 		{
 			LogError("PositionSubMode", lResult, ulErrorCode, g_nodeIdList[i]);
+		}
+	}
+	return lResult;
+}
+
+int EposCommunication::startVolicityMode()
+{
+	int lResult = MMC_FAILED;
+	unsigned int ulErrorCode = 0;
+
+	if((lResult = ActivateVelocityMode(g_pKeyHandle, g_usNodeId, &ulErrorCode))==MMC_FAILED)
+	{
+		LogError("ActivateVelocityMode", lResult, ulErrorCode);
+	}
+	for(int i = 1; i < g_motors; i++)
+	{
+		if((lResult = ActivateVelocityMode(g_pSubKeyHandle, g_nodeIdList[i], &ulErrorCode))==MMC_FAILED)
+		{
+			LogError("ActivateVelocityMode Sub", lResult, ulErrorCode, g_nodeIdList[i]);
 		}
 	}
 	return lResult;
@@ -848,17 +946,6 @@ int EposCommunication::setPosition(unsigned short p_usNodeId, double position_se
 	//Safety check setpoint and homing:
 	if(position_setpoint <= M_PI && position_setpoint >= -1 * M_PI)
 	{
-		// if((lResult = SetPosition(p_DeviceHandle, p_usNodeId, mmToCounts(position_setpoint), &ulErrorCode))==MMC_FAILED)
-		// {
-		// 	LogError("SetPosition", lResult, ulErrorCode, p_usNodeId);
-		// 	return lResult;
-		// }
-		// else{
-		// 	ROS_INFO("SetPosition executed.");
-		// }
-		// std::stringstream msg;
-		// msg << "move to position = " << position_setpoint << ", node = " << g_usNodeId;
-		// LogInfo(msg.str());
 		bool absolute = true;
 
 		if(VCS_MoveToPosition(p_DeviceHandle, p_usNodeId, mmToCounts(position_setpoint), absolute, 1, &ulErrorCode) == MMC_FAILED)
@@ -870,6 +957,44 @@ int EposCommunication::setPosition(unsigned short p_usNodeId, double position_se
 			// ROS_INFO("Movement executed.");
 		}
 	}
+	return lResult;
+}
+
+int EposCommunication::setPositionMust(unsigned short p_usNodeId, double position_setpoint)
+{
+	int lResult = MMC_SUCCESS;
+	unsigned int ulErrorCode = 0;
+	HANDLE p_DeviceHandle = (p_usNodeId == g_usNodeId) ? g_pKeyHandle : g_pSubKeyHandle;
+
+	if(VCS_SetPositionMust(p_DeviceHandle, p_usNodeId, mmToCounts(position_setpoint), &ulErrorCode) == MMC_FAILED)
+	{
+		LogError("VCS_SetPositionMust", lResult, ulErrorCode, p_usNodeId);
+		std::cout<<"position_setpoint: "<<position_setpoint<<", to counts: "<<mmToCounts(position_setpoint)<<std::endl;
+		lResult = MMC_FAILED;
+	}
+	else{
+		// ROS_INFO("Movement executed.");
+	}
+
+	return lResult;
+}
+
+int EposCommunication::setVelocityMust(unsigned short p_usNodeId, double velocity_setpoint)
+{
+	int lResult = MMC_SUCCESS;
+	unsigned int ulErrorCode = 0;
+	HANDLE p_DeviceHandle = (p_usNodeId == g_usNodeId) ? g_pKeyHandle : g_pSubKeyHandle;
+
+	if(VCS_SetVelocityMust(p_DeviceHandle, p_usNodeId, radsToRpm(velocity_setpoint), &ulErrorCode) == MMC_FAILED)
+	{
+		LogError("VCS_SetVelocityMust", lResult, ulErrorCode, p_usNodeId);
+		std::cout<<"velocity_setpoint: "<<velocity_setpoint<<", to counts: "<<radsToRpm(velocity_setpoint)<<std::endl;
+		lResult = MMC_FAILED;
+	}
+	else{
+		// ROS_INFO("Movement executed.");
+	}
+
 	return lResult;
 }
 
@@ -948,14 +1073,14 @@ int EposCommunication::mmToCounts(double mm){
 int EposCommunication::radsToRpm(double rads)
 {
 	int rpm;
-	rpm = rads * 100 * 60 / (2 * M_PI);
+	rpm = -1 * rads * 100 * 60 / (2 * M_PI);
 	return rpm;
 }
 
 double EposCommunication::rpmToRads(int* rpm)
 {
 	double rads;
-	rads = (*rpm) / 100. / 60. * (2 * M_PI);
+	rads = -1 * (*rpm) / 100. / 60. * (2 * M_PI);
 	return rads;
 }
 

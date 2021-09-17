@@ -12,6 +12,7 @@
 
 // STD
 #include <string>
+#include <cmath>
 
 #include "maxon_epos2/EposCommunication.hpp"
 
@@ -30,45 +31,31 @@ namespace maxon_epos2 {
 class EposController
 {
  public:
+  EposController();
   /*!
    * Constructor.
    * @param nodeHandle the ROS node handle.
    */
-  EposController(ros::NodeHandle& nodeHandle);
+  // EposController(ros::NodeHandle& nodeHandle);
 
   /*!
    * Destructor.
    */
   virtual ~EposController();
-
-  void publisher_loop();
-  void close_device();
+  bool deviceOpenedCheck();
+  bool read(int id, double& pos, double& vel, double& eff, double offset=0);
+  bool readPosition(int id, double& pos, double offset);
+  bool writeProfilePosition(int id, double& cmd, double& vel, double offset=0);
+  bool writePosition(int id, double& cmd, double offset);
+  bool writeVelocity(int id, double& cmd);
+  void closeDevice();
 
  private:
   /*!
    * Reads and verifies the ROS parameters.
    * @return true if successful.
    */
-  bool readParameters();
-  bool homingCallback(std_srvs::Trigger::Request& request, std_srvs::Trigger::Response& response);
-  bool serviceCallback(maxon_epos2::epos_motor_service::Request& request, maxon_epos2::epos_motor_service::Response& response);
-
-  //! ROS node handle.
-  ros::NodeHandle& nodeHandle_;
-
-  //! ROS topic publisher.
-  ros::Publisher publisher_;
-
-  //! ROS service server
-  ros::ServiceServer service_;
-  ros::ServiceServer homing_service_;
-
-  //! ROS publisher topic name
-  std::string publisherTopic_;
-
-  //! ROS service server name
-  std::string serviceName_;
-
+  // bool readParameters();
   //! Device object
   EposCommunication epos_device_;
 

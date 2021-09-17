@@ -112,8 +112,8 @@
     <limit
       lower="-3.1415926"
       upper="3.1415926"
-      effort="1000"
-      velocity="6" />
+      effort="1200"
+      velocity="3.29" />
   </joint>
   <link
     name="link_2">
@@ -168,10 +168,10 @@
     <axis
       xyz="0 -1 0" />
     <limit
-      lower="-3"
+      lower="0"
       upper="3.1415926"
-      effort="1000"
-      velocity="6" />
+      effort="1200"
+      velocity="3.29" />
   </joint>
   <link
     name="link_3">
@@ -224,12 +224,12 @@
     <child
       link="link_3" />
     <axis
-      xyz="-1 0 0" />
+      xyz="1 0 0" />
     <limit
       lower="-3.1415926"
       upper="3.1415926"
       effort="1000"
-      velocity="6" />
+      velocity="2.39" />
   </joint>
   <link
     name="link_4">
@@ -282,12 +282,12 @@
     <child
       link="link_4" />
     <axis
-      xyz="0 1 0" />
+      xyz="0 -1 0" />
     <limit
-      lower="0"
-      upper="3.1415926"
+      lower="-3.1415926"
+      upper="0"
       effort="1000"
-      velocity="6" />
+      velocity="2.39" />
   </joint>
   <link
     name="link_5">
@@ -340,12 +340,12 @@
     <child
       link="link_5" />
     <axis
-      xyz="-1 0 0" />
+      xyz="1 0 0" />
     <limit
       lower="-3.1415926"
       upper="3.1415926"
       effort="1000"
-      velocity="6" />
+      velocity="2.39" />
   </joint>
   <link
     name="link_6">
@@ -398,12 +398,12 @@
     <child
       link="link_6" />
     <axis
-      xyz="0 1 0" />
+      xyz="0 -1 0" />
     <limit
       lower="-1.7"
       upper="1.7"
       effort="1000"
-      velocity="6" />
+      velocity="2.77" />
   </joint>
   <link
     name="link_7">
@@ -439,11 +439,11 @@
     <child
       link="link_7" />
     <axis
-      xyz="-1 0 0" />
+      xyz="1 0 0" />
     <limit
       lower="-3.1415926"
       upper="3.1415926"
       effort="1000"
-      velocity="6" />
+      velocity="2.77" />
   </joint>
 </robot>

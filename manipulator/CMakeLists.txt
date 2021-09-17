@@ -12,6 +12,9 @@ find_package(catkin REQUIRED COMPONENTS
   rospy
   std_msgs
   message_generation
+  maxon_epos2
+  controller_manager
+  hardware_interface
 )
 
 ## System dependencies are found with CMake's conventions
@@ -106,7 +109,7 @@ generate_messages(
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES manipulator
- CATKIN_DEPENDS roscpp rospy std_msgs
+ CATKIN_DEPENDS roscpp rospy std_msgs maxon_epos2 controller_manager hardware_interface
 #  DEPENDS system_lib
 )
 
@@ -123,6 +126,7 @@ include_directories(
 
 ## Declare a C++ library
 add_library(${PROJECT_NAME}
+  src/hardware_interface.cpp
   src/Manipulator.cpp
 )
 
@@ -148,6 +152,7 @@ add_dependencies(${PROJECT_NAME}_node ${${PROJECT_NAME}_EXPORTED_TARGETS} ${catk
 
 ## Specify libraries to link a library or executable target against
 target_link_libraries(${PROJECT_NAME}_node
+  ${PROJECT_NAME}
   ${catkin_LIBRARIES}
 )
 

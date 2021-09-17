@@ -69,13 +69,17 @@ class EposCommunication
   bool 	deviceOpenedCheck();
   int 	homing();
   int 	startPositionMode();
+  int   startVolicityMode();
+  int   setHomingParameter(unsigned short p_usNodeId, unsigned int* p_pErrorCode);
   int   setPositionProfile(unsigned short p_usNodeId,
-                           float profile_velocity,
-										       float profile_acceleration,
-										       float profile_deceleration);
-  int 	setPosition(unsigned short p_usNodeI, float position_setpoint);
-  int 	getPosition(unsigned short p_usNodeI, float* pPositionIs);
-  int 	getVelocity(unsigned short p_usNodeI, float* pVelocityIs);
+                           double profile_velocity,
+										       double profile_acceleration,
+										       double profile_deceleration);
+  int 	setPosition(unsigned short p_usNodeI, double position_setpoint);
+  int   setPositionMust(unsigned short p_usNodeId, double position_setpoint);
+  int   setVelocityMust(unsigned short p_usNodeId, double velocity_setpoint);
+  int 	getPosition(unsigned short p_usNodeI, double* pPositionIs);
+  int 	getVelocity(unsigned short p_usNodeI, double* pVelocityIs);
   int 	closeDevice();
 
  private:
@@ -121,6 +125,8 @@ class EposCommunication
   // int	  PositionMode(unsigned int* p_pErrorCode);
   int 	HomingMode(unsigned int* p_pErrorCode);
   int	  ActivateProfilePositionMode(HANDLE p_DeviceHandle, unsigned short p_usNodeId, unsigned int* p_pErrorCode);
+  int   ActivatePositionMode(HANDLE p_DeviceHandle, unsigned short p_usNodeId, unsigned int* p_pErrorCode);
+  int   ActivateVelocityMode(HANDLE p_DeviceHandle, unsigned short p_usNodeId, unsigned int* p_pErrorCode);
   int 	ActivateHomingMode(HANDLE p_DeviceHandle, unsigned short p_usNodeId, unsigned int* p_pErrorCode);
   int 	FindHome(unsigned int* p_pErrorCode);
   int 	HomingSuccess(bool* homing_success, unsigned int* p_pErrorCode);
@@ -131,10 +137,10 @@ class EposCommunication
   int	  PrintAvailableProtocols();
   int	  GetPosition(int* pPositionIsCounts, unsigned int* p_pErrorCode);
   int	  GetVelocity(int* pVelocityIsCounts, unsigned int* p_pErrorCode);
-  float countsTomm(int* counts);
-  int 	mmToCounts(float mm);
-  int   radsToRpm(float rads);
-  float rpmToRads(int* rpm);
+  double countsTomm(int* counts);
+  int 	mmToCounts(double mm);
+  int   radsToRpm(double rads);
+  double rpmToRads(int* rpm);
 
 
 }; /* Class */

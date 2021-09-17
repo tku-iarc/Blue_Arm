@@ -17,7 +17,6 @@ EposCommunication::EposCommunication()
 	g_pKeyHandle = 0; //set adress to zero
 	g_pSubKeyHandle = 0;
 	g_usNodeId = 1;
-	// g_usSubNodeId = 2;
 	g_baudrate = 0;
 }
 

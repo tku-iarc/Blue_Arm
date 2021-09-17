@@ -84,22 +84,17 @@ void BlueArmInterface::checkCmdLimit(int cmd_indx)
 
 bool BlueArmInterface::readFake()
 {
-    // if(epos_controller.deviceOpenedCheck() == false)
-    //     return false;
     for (int i=0; i < jd_ptr.size(); i++)
     {
         jd_ptr[i]->joint_angle_ = jd_ptr[i]->angle_cmd_;
         jd_ptr[i]->velocity_ = 0;
         jd_ptr[i]->effort_ = 0;
     }
-    // std::cout<<std::endl;
     return true;
 }
 
 bool BlueArmInterface::readPosition()
 {
-    // if(epos_controller.deviceOpenedCheck() == false)
-    //     return false;
     for (int i=0; i < jd_ptr.size(); i++)
     {
         jd_ptr[i]->velocity_ = jd_ptr[i]->velocity_cmd_;
@@ -109,16 +104,12 @@ bool BlueArmInterface::readPosition()
             ROS_ERROR("Read Joint States Fail!!!");
             return false;
         }
-        // std::cout<<jd_ptr[i]->joint_angle_<<", ";
     }
-    // std::cout<<std::endl;
     return true;
 }
 
 bool BlueArmInterface::readAll()
 {
-    // if(epos_controller.deviceOpenedCheck() == false)
-    //     return false;
     for (int i=0; i < jd_ptr.size(); i++)
     {
         if(epos_controller.read(jd_ptr[i]->id_, jd_ptr[i]->joint_angle_, jd_ptr[i]->velocity_, jd_ptr[i]->effort_,  jd_ptr[i]->home_offset_) == false)
@@ -126,15 +117,12 @@ bool BlueArmInterface::readAll()
             ROS_ERROR("Read Joint States Fail!!!");
             return false;
         }
-        // std::cout<<jd_ptr[i]->joint_angle_<<", ";
     }
-    // std::cout<<std::endl;
     return true;
 }
 
 bool BlueArmInterface::writePosition(ros::Duration period)
 {
-    // std::cout<<"joint data in write: "<<jd_ptr[3]->joint_angle_<<", "<<jd_ptr[3]->angle_cmd_<<std::endl;
     if(epos_controller.deviceOpenedCheck() == false)
         return false;
     jnt_pos_limits_interface.enforceLimits(period);
@@ -154,7 +142,6 @@ bool BlueArmInterface::writePosition(ros::Duration period)
 
 bool BlueArmInterface::writeVelocity(ros::Duration period)
 {
-    // std::cout<<"joint data in write: "<<jd_ptr[3]->joint_angle_<<", "<<jd_ptr[3]->angle_cmd_<<std::endl;
     if(epos_controller.deviceOpenedCheck() == false)
         return false;
     jnt_vel_limits_interface.enforceLimits(period);

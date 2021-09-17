@@ -10,8 +10,6 @@
 #include "maxon_epos2/EposController.hpp"
 #include "manipulator/joint_data.h"
 
-// using joint_limits_interface::PositionJointSaturationHandle;
-// using joint_limits_interface::VelocityJointSaturationHandle;
 
 namespace hardware_interface
 {

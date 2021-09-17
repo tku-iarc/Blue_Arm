@@ -21,9 +21,6 @@ int main(int argc, char** argv)
 	ros::AsyncSpinner spinner(1);
     spinner.start();
 	ros::NodeHandle nodeHandle;
-	ros::Time start = ros::Time::now();
-	ros::Time test1 = ros::Time::now();
-	ros::Time test = ros::Time::now();
 
 	signal(SIGINT, sigintHandler);
 
@@ -31,10 +28,7 @@ int main(int argc, char** argv)
 
 	ros::Rate loop_rate(blue_arm->sample_rate);
 	while (ros::ok()){
-		test1 = ros::Time::now();
 		blue_arm->process(loop_rate);
-		test = ros::Time::now();
-		// std::cout<<"go time = "<<(test - start).toSec()<<"spend "<<(test - test1).toSec()<<std::endl;
 		ros::spinOnce();
 		loop_rate.sleep();
 	}

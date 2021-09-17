@@ -10,7 +10,7 @@ add_compile_options(-std=c++11)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   # message_generation
-  # std_msgs
+  std_msgs
 )
 
 ## System dependencies are found with CMake's conventions
@@ -103,7 +103,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES ${PROJECT_NAME}_core
- CATKIN_DEPENDS roscpp # message_runtime std_msgs
+ CATKIN_DEPENDS roscpp message_runtime std_msgs
  # DEPENDS system_lib
 )
 

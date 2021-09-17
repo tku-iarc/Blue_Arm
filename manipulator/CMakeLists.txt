@@ -10,7 +10,7 @@ project(manipulator)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
-  # std_msgs
+  std_msgs
   # message_generation
   maxon_epos2
   controller_manager
@@ -109,7 +109,7 @@ find_package(catkin REQUIRED COMPONENTS
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES manipulator
- CATKIN_DEPENDS roscpp rospy  maxon_epos2 controller_manager hardware_interface
+ CATKIN_DEPENDS roscpp rospy  maxon_epos2 controller_manager hardware_interface std_msgs message_runtime
 #  DEPENDS system_lib
 )
 

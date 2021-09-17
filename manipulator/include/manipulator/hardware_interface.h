@@ -25,8 +25,6 @@ public:
   bool writePosition(ros::Duration period);
   bool writeVelocity(ros::Duration period);
   void closeDevice();
-  ros::Time get_time();
-  ros::Duration get_period();
   float sample_rate;
 
 private:

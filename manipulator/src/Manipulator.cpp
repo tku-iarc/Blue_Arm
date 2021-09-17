@@ -17,7 +17,7 @@ Manipulator::~Manipulator()
     delete blue_arm_cm;
 }
 
-void Manipulator::joint_data_init()
+void Manipulator::jointDataInit()
 {
     joint_data.push_back(new JointData());
     joint_data[0]->id_           = 1;

@@ -157,17 +157,4 @@ bool BlueArmInterface::writeVelocity(ros::Duration period)
     return true;
 }
 
-ros::Time BlueArmInterface::get_time()
-{
-    time_now = ros::Time::now();
-    return time_now;
-}
-ros::Duration BlueArmInterface::get_period()
-{
-    period = time_now - time_last;
-    time_last = time_now;
-    std::cout<<"period = "<<period<<std::endl;
-    return period;
-}
-
 }

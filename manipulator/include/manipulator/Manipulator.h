@@ -25,7 +25,7 @@ enum ArmState {Idle, Busy, Error, Disable};
 class Manipulator
 {
 private:
-    void joint_data_init();
+    void jointDataInit();
     /* data */
     ArmState arm_state;
     hardware_interface::BlueArmInterface* blue_arm_interface;

@@ -10,8 +10,8 @@ project(manipulator)
 find_package(catkin REQUIRED COMPONENTS
   roscpp
   rospy
-  std_msgs
-  message_generation
+  # std_msgs
+  # message_generation
   maxon_epos2
   controller_manager
   hardware_interface
@@ -51,18 +51,18 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  ArmState.msg
-)
+# add_message_files(
+#   FILES
+#   ArmState.msg
+# )
 
 ## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  JointMove.srv
-  LineMove.srv
-  P2PMove.srv
-)
+# add_service_files(
+#   FILES
+#   JointMove.srv
+#   LineMove.srv
+#   P2PMove.srv
+# )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -72,10 +72,10 @@ add_service_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##
@@ -109,7 +109,7 @@ generate_messages(
 catkin_package(
  INCLUDE_DIRS include
  LIBRARIES manipulator
- CATKIN_DEPENDS roscpp rospy std_msgs maxon_epos2 controller_manager hardware_interface
+ CATKIN_DEPENDS roscpp rospy  maxon_epos2 controller_manager hardware_interface
 #  DEPENDS system_lib
 )
 

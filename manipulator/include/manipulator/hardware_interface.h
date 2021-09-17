@@ -41,9 +41,6 @@ private:
   joint_limits_interface::VelocityJointSaturationHandle* vel_limit_handle;
  
   std::vector<JointData*> jd_ptr;
-  ros::Time time_now;
-  ros::Time time_last;
-  ros::Duration period;
   int control_mode;
   ros::NodeHandle& nodeHandle_;
 

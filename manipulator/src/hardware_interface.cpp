@@ -10,8 +10,6 @@ BlueArmInterface::BlueArmInterface(ros::NodeHandle& nodeHandle, std::vector<Join
     this->control_mode = (control_mode.compare("position") == 0) ? 0 : 1;
     this->sample_rate = sample_rate;
     jd_ptr = joint_data;
-    time_now = ros::Time::now();
-    time_last = ros::Time::now();
     for (int i=0; i < jd_ptr.size(); i++)
     {   
         hardware_interface::JointStateHandle state_handle(jd_ptr[i]->joint_name_, &jd_ptr[i]->joint_angle_, &jd_ptr[i]->velocity_, &jd_ptr[i]->effort_);

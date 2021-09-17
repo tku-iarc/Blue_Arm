@@ -6,7 +6,7 @@ Manipulator::Manipulator(ros::NodeHandle& nodeHandle)
     sample_rate = nodeHandle.param<int>("/blue_arm_control/sample_rate", 12);
     control_mode = nodeHandle.param<std::string>("/blue_arm_control/control_mode", "velocity");
     arm_state = Disable;
-    joint_data_init();
+    jointDataInit();
     blue_arm_interface = new hardware_interface::BlueArmInterface(nodeHandle_, this->joint_data, sample_rate, control_mode);
     blue_arm_cm = new controller_manager::ControllerManager(blue_arm_interface, nodeHandle);
 }

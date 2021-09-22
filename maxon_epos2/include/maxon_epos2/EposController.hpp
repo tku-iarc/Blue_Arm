@@ -19,8 +19,6 @@
 // ROS
 #include <ros/ros.h>
 
-#include "maxon_epos2/epos_motor_info.h"
-#include "maxon_epos2/epos_motor_service.h"
 #include <std_srvs/Trigger.h>
 
 namespace maxon_epos2 {

@@ -9,7 +9,7 @@ add_compile_options(-std=c++11)
 ## is used, also find other catkin packages
 find_package(catkin REQUIRED COMPONENTS
   roscpp
-  message_generation
+  # message_generation
   std_msgs
 )
 
@@ -47,16 +47,16 @@ find_package(catkin REQUIRED COMPONENTS
 ##   * add every package in MSG_DEP_SET to generate_messages(DEPENDENCIES ...)
 
 ## Generate messages in the 'msg' folder
-add_message_files(
-  FILES
-  epos_motor_info.msg
-)
+# add_message_files(
+#   FILES
+#   epos_motor_info.msg
+# )
 
 ## Generate services in the 'srv' folder
-add_service_files(
-  FILES
-  epos_motor_service.srv
-)
+# add_service_files(
+#   FILES
+#   epos_motor_service.srv
+# )
 
 ## Generate actions in the 'action' folder
 # add_action_files(
@@ -66,10 +66,10 @@ add_service_files(
 # )
 
 ## Generate added messages and services with any dependencies listed here
-generate_messages(
-  DEPENDENCIES
-  std_msgs  # Or other packages containing msgs
-)
+# generate_messages(
+#   DEPENDENCIES
+#   std_msgs  # Or other packages containing msgs
+# )
 
 ################################################
 ## Declare ROS dynamic reconfigure parameters ##

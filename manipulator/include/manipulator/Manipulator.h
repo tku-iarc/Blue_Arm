@@ -8,14 +8,8 @@
 #include <ros/package.h>
 #include <controller_manager/controller_manager.h>
 
-#include "maxon_epos2/epos_motor_info.h"
-#include "maxon_epos2/epos_motor_service.h"
 #include "manipulator/hardware_interface.h"
 #include "manipulator/joint_data.h"
-#include "manipulator/ArmState.h"
-#include "manipulator/JointMove.h"
-#include "manipulator/LineMove.h"
-#include "manipulator/P2PMove.h"
 
 
 #define DOF 7

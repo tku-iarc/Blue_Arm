@@ -80,6 +80,7 @@ class BlueArmMoveGroup(object):
         self.planning_frame = planning_frame
         self.eef_link = eef_link
         self.group_names = group_names
+        self.dof = 7
 
         #Add box under base
         box_pos = [0, 0, 0]
@@ -108,6 +109,35 @@ class BlueArmMoveGroup(object):
             return self.all_close(pose_to_list(goal), pose_to_list(actual), tolerance)
 
         return True
+
+    def go_to_joint_goal(self, joint_goal):
+        # Copy class variables to local variables to make the web tutorials more clear.
+        # In practice, you should use the class variables directly unless you have a good
+        # reason not to.
+        if len(joint_goal) != self.dof:
+            return False
+        move_group = self.move_group
+
+        ## BEGIN_SUB_TUTORIAL plan_to_joint_state
+        ##
+        ## Planning to a Joint Goal
+        ## ^^^^^^^^^^^^^^^^^^^^^^^^
+        ## The Panda's zero configuration is at a `singularity <https://www.quora.com/Robotics-What-is-meant-by-kinematic-singularity>`_ so the first
+        ## thing we want to do is move it to a slightly better configuration.
+        # We can get the joint values from the group and adjust some of the values:
+
+        # The go command can be called with joint values, poses, or without any
+        # parameters if you have already set the pose or joint target for the group
+        move_group.go(joint_goal, wait=True)
+
+        # Calling ``stop()`` ensures that there is no residual movement
+        move_group.stop()
+
+        ## END_SUB_TUTORIAL
+
+        # For testing:
+        current_joints = move_group.get_current_joint_values()
+        return self.all_close(joint_goal, current_joints, 0.01)
 
     def go_to_pose_goal(self, pos, euler):
         # Copy class variables to local variables to make the web tutorials more clear.

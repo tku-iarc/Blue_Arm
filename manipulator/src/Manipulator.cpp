@@ -47,7 +47,7 @@ void Manipulator::jointDataInit()
     joint_data[1]->angle_cmd_    = 0;
     joint_data[1]->velocity_cmd_ = 0;
     joint_data[1]->effort_       = 0;
-    joint_data[0]->home_offset_  = -1 * M_PI;
+    joint_data[1]->home_offset_  = -1 * M_PI;
 
     joint_data.push_back(new JointData());
     joint_data[2]->id_           = 3;

@@ -34,13 +34,13 @@ blue_arm_controller:
   constraints:
       goal_time: 1
       stopped_velocity_tolerance: 0.05
-      joint_1: {trajectory: 0.5, goal: 0.1}
-      joint_2: {trajectory: 0.5, goal: 0.1}
-      joint_3: {trajectory: 0.5, goal: 0.1}
-      joint_4: {trajectory: 0.5, goal: 0.1}
-      joint_5: {trajectory: 0.5, goal: 0.1}
-      joint_6: {trajectory: 0.5, goal: 0.1}
-      joint_7: {trajectory: 0.5, goal: 0.1}
+      joint_1: {trajectory: 0.8, goal: 0.1}
+      joint_2: {trajectory: 0.8, goal: 0.1}
+      joint_3: {trajectory: 0.8, goal: 0.1}
+      joint_4: {trajectory: 0.8, goal: 0.1}
+      joint_5: {trajectory: 0.8, goal: 0.1}
+      joint_6: {trajectory: 0.8, goal: 0.1}
+      joint_7: {trajectory: 0.8, goal: 0.1}
   stop_trajectory_duration: 0.5
   state_publish_rate:  25
   action_monitor_rate: 12

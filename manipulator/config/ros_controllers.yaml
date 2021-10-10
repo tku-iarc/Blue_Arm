@@ -32,7 +32,7 @@ blue_arm_controller:
     - joint_6
     - joint_7
   constraints:
-      goal_time: 1
+      goal_time: 2
       stopped_velocity_tolerance: 0.05
       joint_1: {trajectory: 1.8, goal: 0.1}
       joint_2: {trajectory: 1.8, goal: 0.1}
@@ -41,36 +41,36 @@ blue_arm_controller:
       joint_5: {trajectory: 1.8, goal: 0.1}
       joint_6: {trajectory: 1.8, goal: 0.1}
       joint_7: {trajectory: 1.8, goal: 0.1}
-  stop_trajectory_duration: 0.5
+  stop_trajectory_duration: 1
   state_publish_rate:  25
   action_monitor_rate: 12
   gains:
     joint_1:
-      p: 3
+      p: 4
       d: 0
       i: 0
     joint_2:
-      p: 3
+      p: 4
       d: 0
       i: 0
     joint_3:
-      p: 3
+      p: 4
       d: 0
       i: 0
     joint_4:
-      p: 3
+      p: 4
       d: 0
       i: 0
     joint_5:
-      p: 3
+      p: 4
       d: 0
       i: 0
     joint_6:
-      p: 3
+      p: 4
       d: 0
       i: 0
     joint_7:
-      p: 3
+      p: 4
       d: 0
       i: 0
 

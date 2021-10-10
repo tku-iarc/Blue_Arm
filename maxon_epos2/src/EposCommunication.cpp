@@ -747,7 +747,7 @@ int EposCommunication::initialization(unsigned short *nodeIdList, int motors){
 	unsigned int pMaxFollowingError;
 	unsigned int pMaxProfileVelocity;
 	unsigned int pMaxAcceleration;
-	unsigned int MaxAcceleration = 5000;
+	unsigned int MaxAcceleration = 10000;
 	if((lResult = VCS_GetMaxFollowingError(g_pKeyHandle, g_usNodeId, &pMaxFollowingError, &ulErrorCode))==MMC_FAILED)
 	{
 		LogError("VCS_GetMaxFollowingError", lResult, ulErrorCode);

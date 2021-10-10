@@ -110,6 +110,20 @@ class BlueArmMoveGroup(object):
 
         return True
 
+    def set_speed(self, speed):
+        success = True
+        if speed > 1 and speed <= 100:
+            speed /= 100.
+        elif speed < 0 or speed > 100:
+            rospy.logerr("Speed range Failed!!")
+            speed = 0.1
+            success = False
+
+        move_group = self.move_group
+        move_group.set_max_velocity_scaling_factor(speed)
+        move_group.set_max_acceleration_scaling_factor(speed)
+        return True
+
     def go_to_joint_goal(self, joint_goal):
         # Copy class variables to local variables to make the web tutorials more clear.
         # In practice, you should use the class variables directly unless you have a good
@@ -316,27 +330,31 @@ def main():
 
     pos = [0.3, 0, 0.15]
     euler = [0, 0, 0]
+    blue_arm.set_speed(0.8)
     if blue_arm.go_to_pose_goal(pos, euler) is False:
         rospy.logerr("Move Robot Failed!!")
-    rospy.sleep(3)
+    # rospy.sleep(3)
 
     pos = [0.3, 0, 0.15]
     euler = [30, 0, 0]
+    blue_arm.set_speed(0.6)
     if blue_arm.go_to_pose_goal(pos, euler) is False:
         rospy.logerr("Move Robot Failed!!")
-    rospy.sleep(3)
+    # rospy.sleep(3)
 
     pos = [0.3, 0, 0.15]
     euler = [0, 30, 0]
+    blue_arm.set_speed(0.4)
     if blue_arm.go_to_pose_goal(pos, euler) is False:
         rospy.logerr("Move Robot Failed!!")
-    rospy.sleep(3)
+    # rospy.sleep(3)
 
     pos = [0.3, 0, 0.15]
     euler = [0, 0, 30]
+    blue_arm.set_speed(0.2)
     if blue_arm.go_to_pose_goal(pos, euler) is False:
         rospy.logerr("Move Robot Failed!!")
-    rospy.sleep(3)
+    # rospy.sleep(3)
     
     
      

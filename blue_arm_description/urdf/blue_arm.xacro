@@ -39,7 +39,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://blue_arm_description/meshes/base_link.STL" />
+          filename="package://blue_arm_description/meshes/visual/base_link.STL" />
       </geometry>
       <material
         name="">
@@ -53,7 +53,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://blue_arm_description/meshes/base_link.STL" />
+          filename="package://blue_arm_description/meshes/collision/base_link.STL" />
       </geometry>
     </collision>
   </link>
@@ -79,7 +79,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://blue_arm_description/meshes/link_1.STL" />
+          filename="package://blue_arm_description/meshes/visual/link_1.STL" />
       </geometry>
       <material
         name="">
@@ -93,7 +93,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://blue_arm_description/meshes/link_1.STL" />
+          filename="package://blue_arm_description/meshes/collision/link_1.STL" />
       </geometry>
     </collision>
   </link>
@@ -102,7 +102,7 @@
     type="revolute">
     <origin
       xyz="0 0 0.14"
-      rpy="0 0 3.1415926" />
+      rpy="0 0 0" />
     <parent
       link="base_link" />
     <child
@@ -137,7 +137,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://blue_arm_description/meshes/link_2.STL" />
+          filename="package://blue_arm_description/meshes/visual/link_2.STL" />
       </geometry>
       <material
         name="">
@@ -151,7 +151,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://blue_arm_description/meshes/link_2.STL" />
+          filename="package://blue_arm_description/meshes/collision/link_2.STL" />
       </geometry>
     </collision>
   </link>
@@ -160,13 +160,13 @@
     type="revolute">
     <origin
       xyz="0 0 0"
-      rpy="0 3.1415926 0" />
+      rpy="0 0 0" />
     <parent
       link="link_1" />
     <child
       link="link_2" />
     <axis
-      xyz="0 -1 0" />
+      xyz="0 1 0" />
     <limit
       lower="-3.1415926"
       upper="0"
@@ -195,7 +195,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://blue_arm_description/meshes/link_3.STL" />
+          filename="package://blue_arm_description/meshes/visual/link_3.STL" />
       </geometry>
       <material
         name="">
@@ -209,7 +209,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://blue_arm_description/meshes/link_3.STL" />
+          filename="package://blue_arm_description/meshes/collision/link_3.STL" />
       </geometry>
     </collision>
   </link>
@@ -217,8 +217,8 @@
     name="joint_3"
     type="revolute">
     <origin
-      xyz="0.19 0 0"
-      rpy="3.1415926 0 0" />
+      xyz="0.1415 0 0"
+      rpy="0 0 0" />
     <parent
       link="link_2" />
     <child
@@ -253,7 +253,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://blue_arm_description/meshes/link_4.STL" />
+          filename="package://blue_arm_description/meshes/visual/link_4.STL" />
       </geometry>
       <material
         name="">
@@ -267,7 +267,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://blue_arm_description/meshes/link_4.STL" />
+          filename="package://blue_arm_description/meshes/collision/link_4.STL" />
       </geometry>
     </collision>
   </link>
@@ -275,7 +275,7 @@
     name="joint_4"
     type="revolute">
     <origin
-      xyz="0 0 -0.0365"
+      xyz="0.0485 0 -0.0365"
       rpy="0 0 0" />
     <parent
       link="link_3" />
@@ -311,7 +311,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://blue_arm_description/meshes/link_5.STL" />
+          filename="package://blue_arm_description/meshes/visual/link_5.STL" />
       </geometry>
       <material
         name="">
@@ -325,7 +325,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://blue_arm_description/meshes/link_5.STL" />
+          filename="package://blue_arm_description/meshes/collision/link_5.STL" />
       </geometry>
     </collision>
   </link>
@@ -369,7 +369,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://blue_arm_description/meshes/link_6.STL" />
+          filename="package://blue_arm_description/meshes/visual/link_6.STL" />
       </geometry>
       <material
         name="">
@@ -383,7 +383,7 @@
         rpy="0 0 0" />
       <geometry>
         <mesh
-          filename="package://blue_arm_description/meshes/link_6.STL" />
+          filename="package://blue_arm_description/meshes/collision/link_6.STL" />
       </geometry>
     </collision>
   </link>

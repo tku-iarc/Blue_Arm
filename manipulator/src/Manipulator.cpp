@@ -38,8 +38,8 @@ void Manipulator::jointDataInit()
     joint_data[1]->id_           = 2;
     joint_data[1]->joint_name_   = "joint_2";
     joint_data[1]->joint_angle_  = 0;
-    joint_data[1]->min_angle_    = 0;
-    joint_data[1]->max_angle_    = M_PI;
+    joint_data[1]->min_angle_    = -1 * M_PI;
+    joint_data[1]->max_angle_    = 0;
     joint_data[1]->max_velocity_ = 1.165 * M_PI * 0.9;
     joint_data[1]->velocity_     = 0;
     joint_data[1]->acceleration_ = 0;
@@ -47,7 +47,7 @@ void Manipulator::jointDataInit()
     joint_data[1]->angle_cmd_    = 0;
     joint_data[1]->velocity_cmd_ = 0;
     joint_data[1]->effort_       = 0;
-    joint_data[0]->home_offset_  = 0;
+    joint_data[1]->home_offset_  = -1 * M_PI;
 
     joint_data.push_back(new JointData());
     joint_data[2]->id_           = 3;
@@ -62,7 +62,7 @@ void Manipulator::jointDataInit()
     joint_data[2]->angle_cmd_    = M_PI;
     joint_data[2]->velocity_cmd_ = 0;
     joint_data[2]->effort_       = 0;
-    joint_data[2]->home_offset_  = M_PI;
+    joint_data[2]->home_offset_  = 0;
 
     joint_data.push_back(new JointData());
     joint_data[3]->id_           = 4;
